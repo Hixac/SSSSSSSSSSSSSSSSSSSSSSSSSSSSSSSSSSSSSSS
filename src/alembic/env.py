@@ -6,8 +6,9 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from ..app.core.config import settings
-from ..app.core.database import Base
+from ..server.core.config import settings
+from ..server.core.models import Model
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -15,7 +16,7 @@ config = context.config
 
 config.set_main_option(
     "sqlalchemy.url",
-    f"{settings.DATABASE_URL}",
+    f"{settings.ASYNC_DB_URI}",
 )
 
 # Interpret the config file for Python logging.
@@ -27,14 +28,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-def import_models(package_name: str):
-    package = importlib.import_module(package_name)
-    for _, module_name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
-        importlib.import_module(module_name)
-
-
-import_models("app.models")
-target_metadata = Base.metadata
+target_metadata = Model.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

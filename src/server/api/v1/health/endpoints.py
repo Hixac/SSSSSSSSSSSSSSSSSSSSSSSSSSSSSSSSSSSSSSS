@@ -3,16 +3,18 @@ from datetime import datetime, UTC
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
-from ...core.config import settings
-from ...schemas.health import HealthResponse
+from src.server.core.config import settings
+from .schemas import HealthResponse
+
 
 router = APIRouter(tags=["health"])
+
 
 @router.get("/health", response_model=HealthResponse)
 async def health():
     http_status = status.HTTP_200_OK
     response = {
-        "status": status.HTTP_200_OK,
+        "status": http_status,
         "version": settings.APP_VERSION,
         "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
     }

@@ -1,3 +1,10 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
 [project]
 name = "manyS"
 version = "0.0.1"
@@ -14,13 +21,38 @@ dependencies = [
     "psycopg[binary]>=3.2.13",
     "uuid6>=2025.0.1",
     "alembic>=1.17.2",
+    "asyncpg>=0.31.0",
+    "fastcrud>=0.20.0",
+    "redis>=7.1.0",
+    "pyjwt>=2.10.1",
+    "pytest-asyncio>=1.3.0",
 ]
 
 [dependency-groups]
 dev = [
     "basedpyright>=1.34.0",
+    "faker>=38.2.0",
     "flake8>=7.3.0",
     "mypy>=1.19.0",
     "pytest>=9.0.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-xdist[psutil]>=3.8.0",
     "uvicorn>=0.38.0",
 ]
+
+[tool.basedpyright]
+include = ["src"]
+exclude = ["**/__pycache__"]
+
+typeCheckingMode = "recommended"
+reportAny = "none"
+reportExplicitAny = "none"
+reportIgnoreCommentWithoutRule = false
+reportUnannotatedClassAttribute = false
+reportMissingSuperCall = false
+reportMissingTypeStubs = false
+reportUnknownVariableType = false
+
+[project.scripts]
+init_postgres = "init_db:main"
+
