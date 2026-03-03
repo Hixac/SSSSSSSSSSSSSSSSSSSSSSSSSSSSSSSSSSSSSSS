@@ -4,7 +4,7 @@ from src.server.models.user import User
 from src.server.api.v1.user.repository import UserRepository
 
 
-class OAuthService:
+class AuthService:
 
     async def authenticate(
         self,
@@ -25,4 +25,4 @@ class OAuthService:
         return user
 
 
-oauth_service = OAuthService()
+auth_service = AuthService()

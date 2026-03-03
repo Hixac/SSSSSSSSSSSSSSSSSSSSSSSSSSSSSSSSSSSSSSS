@@ -139,6 +139,13 @@ class PaymentNotReady(ManysError):
     ) -> None:
         super().__init__(message, status_code)
 
+class UnprocessableContent(ManysError):
+    def __init__(
+        self,
+        message: str,
+        status_code: int = 422
+    ) -> None:
+        super().__init__(message, status_code)
 
 class ValidationError(TypedDict):
     loc: tuple[int | str, ...]

@@ -8,15 +8,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Environment(StrEnum):
     development = "development"
     testing = "testing"  # Used for running tests
-    sandbox = "sandbox"
     production = "production"
-    test = "test"  # Used for the test environment in Render
 
 
 
 env = Environment(os.getenv("MANYS_ENV", Environment.development))
 if env == Environment.testing:
-    env_file = ".env"
+    env_file = ".env.testing"
 else:
     env_file = ".env"
 
@@ -24,6 +22,7 @@ else:
 class JWTSettings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
 
 class EnvironmentSettings(BaseSettings):
@@ -92,7 +91,8 @@ class Settings(
         JWTSettings
 ):
     model_config = SettingsConfigDict(
-            env_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "..", ".env"),
+            env_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "..", 
+                                  env_file),
             env_file_encoding="utf-8",
             case_sensitive=True,
             extra="ignore",

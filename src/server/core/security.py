@@ -1,4 +1,5 @@
 from typing import Any
+from datetime import datetime, timedelta
 
 import jwt
 from bcrypt import (
@@ -37,3 +38,16 @@ def jwt_decode(encoded_jwt: str | bytes) -> dict[str, Any]:
         key=settings.SECRET_KEY,
         algorithms=[settings.ALGORITHM]
     )
+
+
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
+    to_encode = data.copy()
+
+    if expires_delta:
+        expire = datetime.now() + expires_delta
+    else:
+        expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt_encode(to_encode)
+    return encoded_jwt
