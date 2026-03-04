@@ -1,2 +1,11 @@
 services:
-  WRITE THAT DOWN HUGE TODO
+
+  database:
+    image: postgres:18-trixie
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports: 
+      - "${DB_PORT}:5432"
+    command: ["postgres", "-N", "1000"]
