@@ -90,6 +90,9 @@ class Settings(
         EnvironmentSettings,
         JWTSettings
 ):
+    LOG_LEVEL: str
+    CORS_ORIGINS: list[str]
+
     model_config = SettingsConfigDict(
             env_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "..", 
                                   env_file),

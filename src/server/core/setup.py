@@ -17,13 +17,15 @@ from src.server.core.kit.db.postgres import (
     create_async_sessionmaker,
     create_sync_sessionmaker,
 )
-from src.server.core.logger import logging
+from src.server.core.logger import logger  # TODO: fix logger
 from src.server.core.exception_handlers import add_exception_handlers
 
+import structlog
 from fastapi import FastAPI, APIRouter
+from fastapi.middleware.cors import CORSMiddleware
 
 
-LOGGER = logging.getLogger(__file__)
+LOGGER = structlog.getLogger(__file__)
 
 
 class State(TypedDict):
@@ -68,6 +70,13 @@ def create_application(router: APIRouter) -> FastAPI:
 
     if not settings.is_testing():
         application.add_middleware(AsyncSessionMiddleware)
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     add_exception_handlers(application)
 

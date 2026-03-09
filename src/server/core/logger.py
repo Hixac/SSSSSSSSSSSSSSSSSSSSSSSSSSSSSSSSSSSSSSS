@@ -1,21 +1,44 @@
-import logging
 import os
+import logging
+from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
-LOG_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "logs")
+import structlog
+
+from src.server.core.config import settings
+
+
+LOG_DIR = Path(__file__).parent.parent.parent.parent.joinpath("logs")
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
+
 LOG_FILE_PATH = os.path.join(LOG_DIR, "app.log")
 
-LOGGING_LEVEL = logging.INFO
-LOGGING_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-LOGGING_DATE_FORMAT = "%d-%m-%Y %H:%M:%S"
-
-logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT, datefmt=LOGGING_DATE_FORMAT)
 
 file_handler = RotatingFileHandler(LOG_FILE_PATH, maxBytes=10485760, backupCount=5)
-file_handler.setLevel(LOGGING_LEVEL)
-file_handler.setFormatter(logging.Formatter(LOGGING_FORMAT, LOGGING_DATE_FORMAT))
 
 logging.getLogger("").addHandler(file_handler)
+logging.getLogger("").setLevel(settings.LOG_LEVEL)
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("%d-%m-%Y %H:%M:%S"),
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.ExceptionPrettyPrinter(),
+        structlog.dev.ConsoleRenderer()
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True
+)
+
+
+logger = structlog.get_logger()

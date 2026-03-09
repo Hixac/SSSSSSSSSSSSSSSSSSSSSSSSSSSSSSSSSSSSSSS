@@ -2,7 +2,6 @@ import pytest
 from httpx import AsyncClient
 
 from src.server.core.security import jwt_decode
-from src.server.core.config import settings
 
 
 @pytest.mark.asyncio
@@ -21,8 +20,5 @@ class TestAuth:
 
         token = response.cookies["access_token"]
         data = jwt_decode(token)
-
-        print(data)
-        print(settings.SECRET_KEY)
 
         assert "exp" in data
