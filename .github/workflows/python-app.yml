@@ -25,9 +25,12 @@ jobs:
         python-version: ${{ env.python-version }}
     - name: Install dependencies
       run: |
+        docker compose --env-file .env.testing up -d
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f pyproject.toml ]; then pip install . ; fi
+        if [ -f pyproject.toml ]; then 
+          pip install . ;
+          pip install --group ci-pipeline
+        fi
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
