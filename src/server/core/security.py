@@ -8,6 +8,7 @@ from bcrypt import (
     checkpw
 )
 from src.server.core.config import settings
+from src.server.core.kit.utils import utc_now
 
 
 def hash_password(password: str) -> str:
@@ -40,14 +41,14 @@ def jwt_decode(encoded_jwt: str | bytes) -> dict[str, Any]:
     )
 
 
-def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> tuple[str, datetime]:
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = utc_now() + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = utc_now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt_encode(to_encode)
-    return encoded_jwt
+    return encoded_jwt, expire

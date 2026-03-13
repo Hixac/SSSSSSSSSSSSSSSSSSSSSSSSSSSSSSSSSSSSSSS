@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import (
@@ -7,7 +8,7 @@ from pydantic import (
 )
 
 
-class AuthPasswordSchema(BaseModel):
+class AuthLoginSchema(BaseModel):
     email: Annotated[EmailStr, Field(examples=["lolololol@example.com"])]
     password: Annotated[str, Field(examples=["DASDASddasj23"])]
 

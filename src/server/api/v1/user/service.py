@@ -24,7 +24,6 @@ class UserService:
     async def create(
         self,
         session: AsyncSession,
-        *,
         name: str,
         surname: str,
         email: str,

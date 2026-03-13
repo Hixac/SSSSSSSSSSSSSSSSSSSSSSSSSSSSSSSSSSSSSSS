@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from enum import StrEnum
 
 from pydantic import computed_field
@@ -33,6 +34,10 @@ class EnvironmentSettings(BaseSettings):
 
     def is_testing(self) -> bool:
         return self.is_environment({Environment.testing})
+
+
+class UserSessionSettings(BaseSettings):
+    USER_SESSION_TTL: timedelta = timedelta(days=31)
 
 
 class AppSettings(BaseSettings):
@@ -84,11 +89,12 @@ class DatabaseSettings(BaseSettings):
 
 
 class Settings(
-        AppSettings,
-        DatabaseSettings,
-        RedisSettings,
-        EnvironmentSettings,
-        JWTSettings
+    AppSettings,
+    DatabaseSettings,
+    RedisSettings,
+    EnvironmentSettings,
+    JWTSettings,
+    UserSessionSettings
 ):
     LOG_LEVEL: str
     CORS_ORIGINS: list[str]

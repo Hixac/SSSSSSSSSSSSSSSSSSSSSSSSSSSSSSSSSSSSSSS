@@ -38,7 +38,7 @@ class State(TypedDict):
 
 
 @asynccontextmanager
-async def lifespan(api: FastAPI) -> AsyncIterator[State]: # pyright: ignore[reportUnusedParameter]
+async def lifespan(api: FastAPI) -> AsyncIterator[State]:  # pyright: ignore[reportUnusedParameter]
     LOGGER.info("Starting manyS API")
 
     async_engine = create_async_engine("app")

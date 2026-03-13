@@ -9,7 +9,6 @@ class AuthService:
     async def authenticate(
         self,
         session: AsyncSession,
-        *,
         email: str,
         password: str
     ) -> User | None:
