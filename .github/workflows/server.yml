@@ -25,8 +25,8 @@ jobs:
         python-version: ${{ env.python-version }}
     - name: Install dependencies
       run: |
-        cd server
         docker compose --env-file .env.testing up -d
+        cd server
         python -m pip install --upgrade pip
         if [ -f pyproject.toml ]; then 
           pip install . ;

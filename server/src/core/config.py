@@ -87,19 +87,24 @@ class PostgresSettings(BaseSettings):
         return f"{self.POSTGRES_ASYNC_PREFIX}{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_NAME}"
 
 
+class VKSettings(BaseSettings):
+    VK_SERVICE_KEY: str | None = None
+
+
 class Settings(
     AppSettings,
     PostgresSettings,
     RedisSettings,
     EnvironmentSettings,
     JWTSettings,
-    UserSessionSettings
+    UserSessionSettings,
+    VKSettings
 ):
     LOG_LEVEL: str
     CORS_ORIGINS: list[str]
 
     model_config = SettingsConfigDict(
-            env_file=Path(__file__).parent.parent.parent.joinpath(env_file),
+            env_file=Path(__file__).parent.parent.parent.parent.joinpath(env_file),
             env_file_encoding="utf-8",
             case_sensitive=True,
             extra="ignore",

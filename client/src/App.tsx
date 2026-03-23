@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Login from './components/login.component';
 import SignUp from './components/signup.component';
 import { AuthProvider } from './contexts/auth.context';
+import Feed from "./components/feed.component"
 
 function App() {
   const [loginOpen, setLoginOpen] = useState(true); // or false initially
@@ -28,13 +29,14 @@ function App() {
 
   return (
     <>
-     <AuthProvider>
-      {/* You might have a button to open login dialog initially */}
-      <Login open={loginOpen} onClose={handleLoginClose} />
-      <SignUp open={signUpOpen} onClose={handleSignUpClose} onLoginClick={handleBackToLogin} />
-     </AuthProvider>
+      <Feed/>
     </>
   );
+     // <AuthProvider>
+     //  {/* You might have a button to open login dialog initially */}
+     //  <Login open={loginOpen} onClose={handleLoginClose} />
+     //  <SignUp open={signUpOpen} onClose={handleSignUpClose} onLoginClick={handleBackToLogin} />
+     // </AuthProvider>
 }
 
 export default App;

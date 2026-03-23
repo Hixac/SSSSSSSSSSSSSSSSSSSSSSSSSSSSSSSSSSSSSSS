@@ -103,5 +103,4 @@ async def logout(
 async def me(
     cookies: Annotated[UserBase, Depends(validate_cookies)]
 ) -> JSONResponse:
-    LOGGER.info("cookies info", cookies=cookies)
     return JSONResponse(cookies.model_dump(exclude={"exp"}))
