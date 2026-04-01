@@ -1,7 +1,9 @@
 import os
 
+from src.core.constants import ENV_VAR, Environment
 
-os.environ["MANYS_ENV"] = "testing"
+
+os.environ[ENV_VAR] = Environment.test
 
 
 from .fixtures import *

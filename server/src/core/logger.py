@@ -8,7 +8,7 @@ import structlog
 from src.core.config import settings
 
 
-LOG_DIR = Path(__file__).parent.parent.parent.parent.joinpath("logs")
+LOG_DIR = Path(__file__).parent.parent.parent.joinpath("logs")
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 

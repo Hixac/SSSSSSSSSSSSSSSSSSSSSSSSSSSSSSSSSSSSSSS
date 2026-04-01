@@ -8,7 +8,7 @@ from bcrypt import (
     checkpw
 )
 from src.core.config import settings
-from src.core.kit.utils import utc_now
+from src.core.utilities import utc_now
 
 
 def hash_password(password: str) -> str:

@@ -7,7 +7,7 @@ from sqlalchemy_utils import drop_database, database_exists, create_database
 
 from src.core.config import settings
 from src.core.models import Model
-from src.core.kit.db.postgres import create_async_engine
+from src.core.database import create_async_engine
 
 
 def get_database_url(worker_id: str, driver: str = "asyncpg") -> str:
@@ -32,12 +32,7 @@ async def initialize_database(worker_id: str) -> AsyncIterator[None]:
 
     create_database(sync_db_url)
 
-    engine = create_async_engine(
-        dsn=get_database_url(worker_id),
-        application_name="test_async",
-        pool_size=settings.POSTGRES_POOL_SIZE,
-        pool_recycle=settings.POSTGRES_POOL_RECYCLE_SECONDS
-    )
+    engine = create_async_engine("test", url=get_database_url(worker_id))
 
     async with engine.begin() as conn:
         await conn.run_sync(Model.metadata.create_all)
@@ -51,12 +46,7 @@ async def initialize_database(worker_id: str) -> AsyncIterator[None]:
 
 @pytest_asyncio.fixture
 async def session(worker_id: str) -> AsyncIterator[AsyncSession]:
-    engine = create_async_engine(
-        dsn=get_database_url(worker_id),
-        application_name="test_async",
-        pool_size=settings.POSTGRES_POOL_SIZE,
-        pool_recycle=settings.POSTGRES_POOL_RECYCLE_SECONDS
-    )
+    engine = create_async_engine("test", url=get_database_url(worker_id))
 
     connection = await engine.connect()
     transaction = await connection.begin()

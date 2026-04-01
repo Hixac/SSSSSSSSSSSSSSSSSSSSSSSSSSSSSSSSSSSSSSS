@@ -1,22 +1,16 @@
 import os
 from pathlib import Path
 from datetime import timedelta
-from enum import StrEnum
 
 from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
-class Environment(StrEnum):
-    development = "development"
-    testing = "testing"  # Used for running tests
-    production = "production"
+from src.core.constants import ENV_VAR, Environment
 
 
-
-env = Environment(os.getenv("MANYS_ENV", Environment.development))
-if env == Environment.testing:
-    env_file = ".env.testing"
+env = Environment(os.getenv(ENV_VAR, Environment.development))
+if env == Environment.test:
+    env_file = ".env.test"
 else:
     env_file = ".env"
 
@@ -33,8 +27,8 @@ class EnvironmentSettings(BaseSettings):
     def is_environment(self, environments: set[Environment]) -> bool:
         return self.ENV in environments
 
-    def is_testing(self) -> bool:
-        return self.is_environment({Environment.testing})
+    def is_test(self) -> bool:
+        return self.is_environment({Environment.test})
 
 
 class UserSessionSettings(BaseSettings):
@@ -104,7 +98,7 @@ class Settings(
     CORS_ORIGINS: list[str]
 
     model_config = SettingsConfigDict(
-            env_file=Path(__file__).parent.parent.parent.parent.joinpath(env_file),
+            env_file=Path(__file__).parent.parent.parent.joinpath(env_file),
             env_file_encoding="utf-8",
             case_sensitive=True,
             extra="ignore",

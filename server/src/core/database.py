@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session as SyncSession, sessionmaker
 from src.core.config import settings
 
 
-type ProcessName = Literal["app", "worker", "scheduler", "script"]
+type ProcessName = Literal["app", "test"]
 type AsyncSessionMaker = async_sessionmaker[AsyncSession]
 type SyncSessionMaker = sessionmaker[SyncSession]
 
@@ -40,13 +40,16 @@ def json_serializer(obj: Any) -> str:
     return json.dumps(obj, default=_json_obj_serializer)
 
 
-def create_async_engine(process_name: ProcessName) -> AsyncEngine:
+def create_async_engine(process_name: ProcessName, *, url: str | None = None) -> AsyncEngine:
     connect_args: dict[str, Any] = {}
     connect_args["server_settings"] = {"application_name": process_name}
     connect_args["command_timeout"] = settings.POSTGRES_COMMAND_TIMEOUT_SECONDS
 
+    if url is None:
+        url = str(settings.async_postgres_uri) 
+
     return _create_async_engine(
-        url=str(settings.async_postgres_uri),
+        url=url,
         echo=False,
         connect_args=connect_args,
         pool_size=settings.POSTGRES_POOL_SIZE,
@@ -55,13 +58,16 @@ def create_async_engine(process_name: ProcessName) -> AsyncEngine:
     )
 
 
-def create_sync_engine(process_name: ProcessName) -> SyncEngine:
+def create_sync_engine(process_name: ProcessName, *, url: str | None = None) -> SyncEngine:
     connect_args: dict[str, Any] = {}
     connect_args["server_settings"] = {"application_name": process_name}
     connect_args["options"] = f"-c statement_timeout={int(settings.POSTGRES_COMMAND_TIMEOUT_SECONDS * 1000)}"
 
+    if url is None:
+        url = str(settings.sync_postgres_uri) 
+
     return _create_engine(
-        url=str(settings.async_postgres_uri),
+        url=url,
         echo=False,
         connect_args=connect_args,
         pool_size=settings.POSTGRES_POOL_SIZE,

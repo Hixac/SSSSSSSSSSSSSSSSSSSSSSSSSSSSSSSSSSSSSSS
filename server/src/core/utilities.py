@@ -1,5 +1,5 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 
 
 def utc_now() -> datetime:

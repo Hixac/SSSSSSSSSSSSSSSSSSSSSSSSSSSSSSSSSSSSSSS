@@ -5,8 +5,7 @@ from uuid import UUID
 from sqlalchemy import TIMESTAMP, MetaData, Uuid, inspect
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from src.core.kit.utils import utc_now, generate_uuid
-from src.core.enums import RateLimitGroup
+from src.core.utilities import utc_now, generate_uuid
 
 
 my_metadata = MetaData(
@@ -57,7 +56,7 @@ class IDModel(Model):
 
     @override
     def __hash__(self) -> int:
-        return self.id.int  # pyright: ignore[reportReturnType]
+        return self.id.int
 
     @override
     def __repr__(self) -> str:
@@ -78,13 +77,3 @@ class IDModel(Model):
 
 class RecordModel(IDModel, TimestampedModel):
     __abstract__ = True
-
-
-class RateLimitGroupMixin:
-    __abstract__ = True
-
-    rate_limit_group: Mapped[RateLimitGroup] = mapped_column(
-        nullable=False,
-        default=RateLimitGroup.default,
-    )
-

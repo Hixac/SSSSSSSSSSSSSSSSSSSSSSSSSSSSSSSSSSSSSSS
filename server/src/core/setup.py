@@ -11,7 +11,7 @@ from src.core.database import (
     create_async_engine,
     create_sync_engine
 )
-from src.core.kit.db.postgres import (
+from src.core.database import (
     AsyncSessionMaker,
     SyncSessionMaker,
     create_async_sessionmaker,
@@ -67,7 +67,7 @@ def create_application(router: APIRouter) -> FastAPI:
     application = FastAPI(lifespan=lifespan, title=settings.APP_NAME, debug=settings.DEBUG)
     application.include_router(router)
 
-    if not settings.is_testing():
+    if not settings.is_test():
         application.add_middleware(AsyncSessionMiddleware)
     application.add_middleware(
         CORSMiddleware,
