@@ -13,3 +13,11 @@ def sample_user_data() -> dict[str, str]:
         "email": fake.email(),
         "password": fake.password(),
     }
+
+
+@pytest.fixture
+def sample_auth_data() -> dict[str, str]:
+    return {
+        "email": fake.email(),
+        "password": fake.password(),
+    }

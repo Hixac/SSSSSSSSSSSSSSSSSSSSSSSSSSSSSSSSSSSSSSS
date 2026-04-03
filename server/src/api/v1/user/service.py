@@ -24,8 +24,9 @@ class UserService:
     async def create(
         self,
         session: AsyncSession,
-        name: str,
-        surname: str,
+        *,
+        name: str | None = None,
+        surname: str | None = None,
         email: str,
         password: str
     ) -> User:
@@ -46,7 +47,7 @@ class UserService:
             created_user = await repository.create(user_model, flush=True)
             LOGGER.info("user.create.success")
             return created_user
-        except IntegrityError as e:
+        except IntegrityError:
             LOGGER.warning("user.create.contsraint_violation")
             raise
 
