@@ -97,6 +97,8 @@ class Settings(
     LOG_LEVEL: str
     CORS_ORIGINS: list[str]
 
+    WHERE_TO_STORE_MEDIA: Path = Path("/var/uploads/")
+
     model_config = SettingsConfigDict(
             env_file=Path(__file__).parent.parent.parent.joinpath(env_file),
             env_file_encoding="utf-8",

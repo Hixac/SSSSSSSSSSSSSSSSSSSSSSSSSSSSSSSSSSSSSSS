@@ -27,6 +27,8 @@ dependencies = [
     "pyjwt>=2.10.1",
     "psycopg2-binary>=2.9.11",
     "structlog>=25.5.0",
+    "aiofiles>=25.1.0",
+    "python-multipart>=0.0.22",
 ]
 
 [tool.poe.tasks]

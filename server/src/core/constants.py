@@ -8,3 +8,8 @@ class Environment(StrEnum):
 
 
 ENV_VAR = "MANYS_ENV"
+
+
+class MediaType(StrEnum):
+    image = "image"
+    video = "video"

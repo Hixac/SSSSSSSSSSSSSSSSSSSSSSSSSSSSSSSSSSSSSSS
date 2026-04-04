@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 import httpx
 
 from src.api.v1.vk.schemas import VKPost
@@ -28,12 +28,12 @@ class VKService:
                 } | kwargs
             )
 
-    async def get_posts(self, domain: str, offset: int = 0, count: int = 1) -> list[VKPost]:
+    async def get_posts(self, domain: str, count: int, offset: int) -> list[VKPost]:
         response = await self.vk_request(
             "wall.get",
             domain=domain,
-            offset=offset,
-            count=count
+            count=count,
+            offset=offset
         )
         content = response.json()
 

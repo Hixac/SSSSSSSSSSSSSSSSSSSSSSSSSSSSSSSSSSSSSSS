@@ -7,9 +7,10 @@ from fastapi import APIRouter, Depends, Request, Response
 from src.core.database import AsyncSession, get_db_session
 from src.models.auth_session import AuthSession
 
+from ..user.schemas import UserBase
 from .service import auth_service
-from .schemas import AuthCookie, AuthLoginSchema, AuthRegisterSchema
-from .dependencies import validate_cookies, verify_user
+from .schemas import AuthLoginSchema, AuthRegisterSchema
+from .dependencies import verify_user
 
 
 LOGGER = structlog.get_logger()
@@ -69,3 +70,10 @@ async def cookies(
     _: Annotated[AuthSession, Depends(verify_user)]
 ) -> dict[str, Any]:
     return request.cookies
+
+
+@router.get("/me")
+async def me(
+    auth_session: Annotated[AuthSession, Depends(verify_user)]
+) -> UserBase:
+    return auth_session.user

@@ -131,14 +131,6 @@ class ResourceAlreadyExists(ManysError):
         super().__init__(message, status_code)
 
 
-class PaymentNotReady(ManysError):
-    def __init__(
-        self,
-        message: str = "Organization is not ready to accept payments",
-        status_code: int = 403,
-    ) -> None:
-        super().__init__(message, status_code)
-
 class UnprocessableContent(ManysError):
     def __init__(
         self,
@@ -147,30 +139,20 @@ class UnprocessableContent(ManysError):
     ) -> None:
         super().__init__(message, status_code)
 
-class ValidationError(TypedDict):
-    loc: tuple[int | str, ...]
-    msg: LiteralString
-    type: LiteralString
-    input: Any
-    ctx: NotRequired[dict[str, Any]]
-    url: NotRequired[str]
+
+class ContentTooLarge(ManysError):
+    def __init__(
+        self,
+        message: str,
+        status_code: int = 413
+    ) -> None:
+        super().__init__(message, status_code)
 
 
-class ManysRequestValidationError(ManysError):
-    def __init__(self, errors: Sequence[ValidationError]) -> None:
-        self._errors = errors
-
-    def errors(self) -> list[ErrorDetails]:
-        pydantic_errors: list[InitErrorDetails] = []
-        for error in self._errors:
-            pydantic_errors.append(
-                {
-                    "type": PydanticCustomError(error["type"], error["msg"]),
-                    "loc": error["loc"],
-                    "input": error["input"],
-                }
-            )
-        pydantic_error = PydanticValidationError.from_exception_data(
-            self.__class__.__name__, pydantic_errors
-        )
-        return pydantic_error.errors()
+class UnsupportedMediaType(ManysError):
+    def __init__(
+        self,
+        message: str,
+        status_code: int = 415
+    ) -> None:
+        super().__init__(message, status_code)
