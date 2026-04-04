@@ -5,10 +5,11 @@ from starlette.responses import JSONResponse
 from fastapi import APIRouter, Depends, Request, Response
 
 from src.core.database import AsyncSession, get_db_session
+from src.models.auth_session import AuthSession
 
 from .service import auth_service
 from .schemas import AuthCookie, AuthLoginSchema, AuthRegisterSchema
-from .dependencies import validate_cookies
+from .dependencies import validate_cookies, verify_user
 
 
 LOGGER = structlog.get_logger()
@@ -46,18 +47,25 @@ async def register(
     return await auth_service.register(session, auth)
 
 
-@router.post("/logout")
+@router.post(
+    "/logout",
+    responses={
+        200: {"description": "Successfully logged out"},
+        401: {"description": ""}
+    }
+)
 async def logout(
     response: Response,
-    cookies: Annotated[AuthCookie, Depends(validate_cookies)],
-    session: Annotated[AsyncSession, Depends(get_db_session)]
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    auth_session: Annotated[AuthSession, Depends(verify_user)]
 ) -> JSONResponse:
     response.delete_cookie(key="accessToken")
-    return await auth_service.logout(session, cookies)
+    return await auth_service.logout(session, auth_session)
 
 
 @router.get("/cookies")
 async def cookies(
-    request: Request
+    request: Request,
+    _: Annotated[AuthSession, Depends(verify_user)]
 ) -> dict[str, Any]:
     return request.cookies

@@ -1,6 +1,6 @@
-from __future__ import annotations
-
+import typing
 from datetime import datetime
+
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, TIMESTAMP
@@ -11,6 +11,10 @@ from sqlalchemy.orm import (
 )
 
 from src.core.models import RecordModel
+
+
+if typing.TYPE_CHECKING:
+    from .user import User
 
 
 class AuthSession(RecordModel):

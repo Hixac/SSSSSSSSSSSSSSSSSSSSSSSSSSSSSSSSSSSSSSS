@@ -1,4 +1,6 @@
 from datetime import timedelta
+
+from uuid import UUID
 from fastapi.responses import JSONResponse
 
 from src.api.v1.auth.schemas import AuthCookie, AuthLoginSchema, AuthRegisterSchema
@@ -81,17 +83,24 @@ class AuthService:
     async def logout(
         self,
         session: AsyncSession,
-        auth_cookies: AuthCookie
+        auth_session: AuthSession
     ) -> JSONResponse:
+        repo = AuthSessionRepository.from_session(session)
+        await repo.delete(auth_session)
+
+        return JSONResponse("Successfully logout")
+
+    async def get_session(
+        self,
+        session: AsyncSession,
+        id: UUID
+    ) -> AuthSession:
         repo = AuthSessionRepository.from_session(session)
 
         try:
-            auth_session = await repo.get_or_raise(auth_cookies.id)
-            await repo.delete(auth_session)
+            return await repo.get_or_raise(id)
         except:
-            raise Unauthorized("auth.logout.failed")
-
-        return JSONResponse("Successfully logout")
+            raise Unauthorized("auth.get_session.failed")
 
 
 auth_service = AuthService()

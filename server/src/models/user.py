@@ -1,7 +1,13 @@
+import typing
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models import RecordModel
+
+
+if typing.TYPE_CHECKING:
+    from .auth_session import AuthSession
 
 
 class User(RecordModel):
