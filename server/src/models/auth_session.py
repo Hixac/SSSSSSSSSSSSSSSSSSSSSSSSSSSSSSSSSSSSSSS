@@ -21,7 +21,7 @@ class AuthSession(RecordModel):
     __tablename__ = "auth_sessions"
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["User"] = relationship(back_populates="auth_session")
+    user: Mapped["User"] = relationship(back_populates="auth_sessions")
 
     expire_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, index=True

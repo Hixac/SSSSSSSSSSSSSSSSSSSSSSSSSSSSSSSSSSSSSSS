@@ -1,102 +1,77 @@
-import axios from 'axios';
-import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
-import api from '../api';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { loginRequest, logoutRequest, meRequest, registerRequest } from '../api/auth';
+import type { User } from '../types';
 
-interface User {
-  email: string;
-  name: string;
-  surname: string;
-}
+type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 interface AuthContextType {
   user: User | null;
-  isAuthenticated: boolean;
+  status: AuthStatus;
   login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  signup: (name: string, surname: string, email: string, password: string) => Promise<void>;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<AuthStatus>('loading');
 
-  // Check authentication status on mount
   useEffect(() => {
-    const checkAuth = async () => {
+    let cancelled = false;
+    void (async () => {
       try {
-        const response = await api.get('/auth/me');
-        setUser(response.data);  // assuming response contains user info
-      } catch (error) {
-        // Not authenticated or error – user remains null
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+        const currentUser = await meRequest();
+        if (!cancelled) {
+          setUser(currentUser);
+          setStatus('authenticated');
+        }
+      } catch {
+        if (!cancelled) {
+          setUser(null);
+          setStatus('unauthenticated');
+        }
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    checkAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      if (response.data.user) {
-        setUser(response.data.user);
-      } else {
-        const userResponse = await api.get('/auth/me');
-        setUser(userResponse.data);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        throw new Error(error.response.data.detail || 'Login failed');
-      }
-      throw new Error('Network error');
-    }
+    await loginRequest(email, password);
+    setUser({ email });
+    setStatus('authenticated');
+  };
+
+  const signup = async (email: string, password: string) => {
+    await registerRequest(email, password);
+    setUser({ email });
+    setStatus('authenticated');
   };
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
-      setUser(null);
-    } catch (error) {
-      console.error('Logout error', error);
+      await logoutRequest();
+    } catch {
+      // Session may already be invalid — clear local state anyway.
     }
-  };
-
-  const signup = async (name: string, surname: string, email: string, password: string) => {
-    try {
-      await api.post('/auth/register', { name, surname, email, password })
-      const userResponse = await api.get('/auth/me');
-      setUser(userResponse.data)
-      console.log(userResponse.data)
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        throw new Error(error.response.data.detail || 'Login failed');
-      }
-      throw new Error('Network error');
-    }
-  }
-
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    login,
-    logout,
-    signup,
-    isLoading,
+    setUser(null);
+    setStatus('unauthenticated');
   };
 
   return (
-    <AuthContext.Provider value={value}>
-     {children}
+    <AuthContext.Provider value={{ user, status, login, signup, logout }}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
   return context;
 };

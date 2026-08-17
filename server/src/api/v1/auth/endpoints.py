@@ -7,9 +7,8 @@ from fastapi import APIRouter, Depends, Request, Response
 from src.core.database import AsyncSession, get_db_session
 from src.models.auth_session import AuthSession
 
-from ..user.schemas import UserBase
 from .service import auth_service
-from .schemas import AuthLoginSchema, AuthRegisterSchema
+from .schemas import AuthLoginSchema, AuthRegisterSchema, MeResponse
 from .dependencies import verify_user
 
 
@@ -75,5 +74,5 @@ async def cookies(
 @router.get("/me")
 async def me(
     auth_session: Annotated[AuthSession, Depends(verify_user)]
-) -> UserBase:
-    return auth_session.user
+) -> MeResponse:
+    return MeResponse.model_validate(auth_session.user)

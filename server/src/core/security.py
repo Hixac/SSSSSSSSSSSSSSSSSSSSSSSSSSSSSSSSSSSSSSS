@@ -1,5 +1,4 @@
 from typing import Any
-from datetime import datetime, timedelta
 
 import jwt
 from bcrypt import (
@@ -8,7 +7,6 @@ from bcrypt import (
     checkpw
 )
 from src.core.config import settings
-from src.core.utilities import utc_now
 
 
 def hash_password(password: str) -> str:
@@ -41,14 +39,8 @@ def jwt_decode(encoded_jwt: str | bytes) -> dict[str, Any]:
     )
 
 
-def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> tuple[str, datetime]:
+def create_access_token(data: dict[str, Any]) -> str:
     to_encode = data.copy()
 
-    if expires_delta:
-        expire = utc_now() + expires_delta
-    else:
-        expire = utc_now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-
-    to_encode.update({"expire_at": expire.isoformat()})
     encoded_jwt = jwt_encode(to_encode)
-    return encoded_jwt, expire
+    return encoded_jwt

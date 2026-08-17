@@ -1,2 +1,6 @@
 logs/
 .env
+
+# Local tooling
+.codewhale/
+.ui-build/

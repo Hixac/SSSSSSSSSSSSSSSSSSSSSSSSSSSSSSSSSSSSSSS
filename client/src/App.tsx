@@ -1,42 +1,24 @@
-import { useState } from 'react';
-import Login from './components/login.component';
-import SignUp from './components/signup.component';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/auth.context';
-import Feed from "./components/feed.component"
+import ProtectedRoute from './routes/ProtectedRoute';
+import MainLayout from './layouts/MainLayout';
+import LoginPage from './pages/login.page';
+import SignupPage from './pages/signup.page';
+import BoardPage from './pages/board.page';
 
-function App() {
-  const [loginOpen, setLoginOpen] = useState(true); // or false initially
-  const [signUpOpen, setSignUpOpen] = useState(false);
-
-  const handleLoginClose = (_: {}, reason: string) => {
-    if (reason === 'signUp') {
-      setLoginOpen(false);
-      setSignUpOpen(true);
-    } else if (reason === 'escapeKeyDown') {
-      setLoginOpen(false); // just close login
-    }
-    // ignore backdrop click
-  };
-
-  const handleSignUpClose = () => {
-    setSignUpOpen(false);
-  };
-
-  const handleBackToLogin = () => {
-    setSignUpOpen(false);
-    setLoginOpen(true);
-  };
-
+export default function App() {
   return (
-    <>
-      <Feed/>
-    </>
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/board" element={<BoardPage />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<Navigate to="/board" replace />} />
+      </Routes>
+    </AuthProvider>
   );
-     // <AuthProvider>
-     //  {/* You might have a button to open login dialog initially */}
-     //  <Login open={loginOpen} onClose={handleLoginClose} />
-     //  <SignUp open={signUpOpen} onClose={handleSignUpClose} onLoginClick={handleBackToLogin} />
-     // </AuthProvider>
 }
-
-export default App;

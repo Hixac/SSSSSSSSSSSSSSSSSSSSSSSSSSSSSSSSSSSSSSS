@@ -2,8 +2,9 @@ from datetime import timedelta
 
 from uuid import UUID
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import NoResultFound
 
-from src.api.v1.auth.schemas import AuthCookie, AuthLoginSchema, AuthRegisterSchema
+from src.api.v1.auth.schemas import AuthLoginSchema, AuthRegisterSchema
 from src.api.v1.user.repository import UserRepository
 from src.api.v1.user.service import user_service
 from src.core.security import verify_password, create_access_token
@@ -31,7 +32,7 @@ class AuthService:
             expire_at=utc_now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         ), flush=True)
 
-        token, expire = create_access_token({
+        token = create_access_token({
             "id": str(auth_session.id)
         })
 
@@ -40,7 +41,6 @@ class AuthService:
             key="accessToken",
             value=token,
             httponly=True,
-            expires=expire
         )
 
         return response
@@ -99,7 +99,7 @@ class AuthService:
 
         try:
             return await repo.get_or_raise(id)
-        except:
+        except NoResultFound:
             raise Unauthorized("auth.get_session.failed")
 
 

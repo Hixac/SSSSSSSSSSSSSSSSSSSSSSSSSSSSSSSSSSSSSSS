@@ -22,10 +22,6 @@ class TestAuth:
         )
         assert response.status_code == 200
 
-        token = response.cookies["accessToken"]
-        data = jwt_decode(token)
-        assert "expire_at" in data
-
         response = await client.get("/api/v1/auth/cookies")
         data = jwt_decode(response.json()["accessToken"])
 

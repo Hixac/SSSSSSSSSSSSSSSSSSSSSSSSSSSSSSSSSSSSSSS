@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 
 
+class VKGroup(BaseModel):
+    name: str
+    photo_url: str | None
+
+
 class VKPost(BaseModel):
     likes: int           # response["items"][...]["likes"]["count"]
     reposts: int         # response["items"][...]["resposts"]["count"]

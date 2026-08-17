@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from src.core.database import AsyncSession, get_db_session
 from src.core.security import jwt_decode
 from src.core.exceptions import Unauthorized
+from src.core.utilities import utc_now
 from src.models.auth_session import AuthSession
 
 from .service import auth_service
@@ -26,4 +27,10 @@ async def verify_user(
     cookies: Annotated[AuthCookie, Depends(validate_cookies)],
     session: Annotated[AsyncSession, Depends(get_db_session)]
 ) -> AuthSession:
-    return await auth_service.get_session(session, cookies.id)
+    auth_session = await auth_service.get_session(session, cookies.id)
+
+    if auth_session.expire_at <= utc_now():
+        _ = await auth_service.logout(session, auth_session)
+        raise Unauthorized()
+
+    return auth_session

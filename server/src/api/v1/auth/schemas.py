@@ -1,9 +1,9 @@
-from datetime import datetime
 from typing import Annotated
 
 from uuid import UUID
 from pydantic import (
     BaseModel,
+    ConfigDict,
     Field,
     EmailStr,
     SecretStr,
@@ -22,4 +22,11 @@ class AuthRegisterSchema(BaseModel):
 
 class AuthCookie(BaseModel):
     id: UUID
-    expire_at: datetime
+
+
+class MeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    email: EmailStr
+    name: str | None = None
+    surname: str | None = None

@@ -1,8 +1,9 @@
 from typing import Any
 import httpx
 
-from src.api.v1.vk.schemas import VKPost
+from src.api.v1.vk.schemas import VKGroup, VKPost
 from src.core.config import settings
+from src.core.exceptions import ResourceNotFound
 
 
 class VKService:
@@ -27,6 +28,40 @@ class VKService:
                     "v": "5.131"
                 } | kwargs
             )
+
+    async def is_group_real(self, group: str) -> bool:
+        response = await self.vk_request(
+            "groups.getById",
+            group_id=group,
+        )
+        content = response.json()
+        if len(content["response"]) > 0:
+            return True
+
+        return False
+
+    async def get_group_info(self, domain: str) -> VKGroup:
+        response = await self.vk_request(
+            "groups.getById",
+            group_id=domain,
+            fields="photo_100,photo_200",
+        )
+        content = response.json()
+
+        response_data = content["response"]
+        if isinstance(response_data, dict):
+            groups = response_data.get("groups", [])
+        else:
+            groups = response_data
+
+        if len(groups) == 0:
+            raise ResourceNotFound("No group found")
+
+        group = groups[0]
+        return VKGroup(
+            name=group["name"],
+            photo_url=group.get("photo_200") or group.get("photo_100"),
+        )
 
     async def get_posts(self, domain: str, count: int, offset: int) -> list[VKPost]:
         response = await self.vk_request(
