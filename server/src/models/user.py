@@ -15,7 +15,7 @@ class User(RecordModel):
 
     name: Mapped[str | None] = mapped_column(String(30))
     surname: Mapped[str | None] = mapped_column(String(30))
-    email: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    email: Mapped[str] = mapped_column(String(254), unique=True, index=True)  # String length is the same as EmailStr length
     hashed_password: Mapped[str] = mapped_column(String(255))
 
     auth_sessions: Mapped[list["AuthSession"]] = relationship(

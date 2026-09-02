@@ -14,13 +14,24 @@ class VKService:
     def _route(self, route: str) -> str:
         return self.vk_api_url + route
 
+    def gather(self, response: httpx.Response) -> dict[str, Any]:
+        content = response.json()
+
+        if "error" in content:
+            error = content["error"]
+            raise ResourceNotFound(
+                f"VK error {error.get('error_code')}: {error.get('error_msg')}"
+            )
+
+        return content
+
     async def vk_request(
         self,
         route: str,
         **kwargs: Any
-    ) -> httpx.Response:
+    ) -> dict[str, Any]:
         async with httpx.AsyncClient() as client:
-            return await client.request(
+            response = await client.request(
                 "post",
                 self._route(route),
                 params={
@@ -28,25 +39,25 @@ class VKService:
                     "v": "5.131"
                 } | kwargs
             )
+            return self.gather(response)
 
     async def is_group_real(self, group: str) -> bool:
-        response = await self.vk_request(
-            "groups.getById",
-            group_id=group,
-        )
-        content = response.json()
-        if len(content["response"]) > 0:
-            return True
+        try:
+            content = await self.vk_request(
+                "groups.getById",
+                group_id=group,
+            )
+        except ResourceNotFound:
+            return False
 
-        return False
+        return len(content["response"]) > 0
 
     async def get_group_info(self, domain: str) -> VKGroup:
-        response = await self.vk_request(
+        content = await self.vk_request(
             "groups.getById",
             group_id=domain,
             fields="photo_100,photo_200",
         )
-        content = response.json()
 
         response_data = content["response"]
         if isinstance(response_data, dict):
@@ -64,13 +75,12 @@ class VKService:
         )
 
     async def get_posts(self, domain: str, count: int, offset: int) -> list[VKPost]:
-        response = await self.vk_request(
+        content = await self.vk_request(
             "wall.get",
             domain=domain,
             count=count,
             offset=offset
         )
-        content = response.json()
 
         vkposts: list[VKPost] = []
         for item in content["response"]["items"]:

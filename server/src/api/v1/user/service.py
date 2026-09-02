@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.exc import IntegrityError
 
-from src.core.logger import logging
+from src.core.logger import get_logger
 from src.core.database import AsyncSession
 from src.core.exceptions import ResourceAlreadyExists
 from src.core.security import hash_password
@@ -11,7 +11,7 @@ from src.models.user import User
 from .repository import UserRepository
 
 
-LOGGER = logging.getLogger(__file__)
+LOGGER = get_logger(__name__)
 
 
 class UserService:
@@ -45,10 +45,10 @@ class UserService:
 
         try:
             created_user = await repository.create(user_model, flush=True)
-            LOGGER.info("user.create.success")
+            LOGGER.info("user.create.success", email=email)
             return created_user
         except IntegrityError:
-            LOGGER.warning("user.create.contsraint_violation")
+            LOGGER.warning("user.create.constraint_violation", email=email)
             raise
 
 

@@ -44,15 +44,10 @@ export default function Feed({ domain }: { domain: string }) {
   // Mutable pagination state — avoids re-render churn
   const pageRef = useRef({ offset: 0, finished: false, inFlight: false });
 
-  // Initial load / reset on domain change
+  // Initial load. BoardPage renders <Feed key={domain}> so a domain change
+  // remounts this component with fresh state — no reset here, no stale appends.
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
-    setPosts([]);
-    setFinished(false);
-    pageRef.current = { offset: 0, finished: false, inFlight: false };
-    setGroup(null);
 
     getGroupInfo(domain)
       .then((info) => {

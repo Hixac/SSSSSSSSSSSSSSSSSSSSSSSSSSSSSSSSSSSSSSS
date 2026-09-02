@@ -129,27 +129,15 @@ class ResourceAlreadyExists(ManysError):
 
 
 class UnprocessableContent(ManysError):
-    def __init__(
-        self,
-        message: str,
-        status_code: int = 422
-    ) -> None:
+    def __init__(self, message: str, status_code: int = 422) -> None:
         super().__init__(message, status_code)
 
 
 class ContentTooLarge(ManysError):
-    def __init__(
-        self,
-        message: str,
-        status_code: int = 413
-    ) -> None:
+    def __init__(self, message: str, status_code: int = 413) -> None:
         super().__init__(message, status_code)
 
 
 class UnsupportedMediaType(ManysError):
-    def __init__(
-        self,
-        message: str,
-        status_code: int = 415
-    ) -> None:
+    def __init__(self, message: str, status_code: int = 415) -> None:
         super().__init__(message, status_code)

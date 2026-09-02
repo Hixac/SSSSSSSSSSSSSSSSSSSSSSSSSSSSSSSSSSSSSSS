@@ -41,13 +41,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (email: string, password: string) => {
     await loginRequest(email, password);
-    setUser({ email });
+    const currentUser = await meRequest();
+    setUser(currentUser);
     setStatus('authenticated');
   };
 
   const signup = async (email: string, password: string) => {
     await registerRequest(email, password);
-    setUser({ email });
+    const currentUser = await meRequest();
+    setUser(currentUser);
     setStatus('authenticated');
   };
 
@@ -68,6 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

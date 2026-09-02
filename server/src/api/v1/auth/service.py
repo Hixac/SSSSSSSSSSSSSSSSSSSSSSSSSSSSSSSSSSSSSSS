@@ -7,6 +7,7 @@ from sqlalchemy.exc import NoResultFound
 from src.api.v1.auth.schemas import AuthLoginSchema, AuthRegisterSchema
 from src.api.v1.user.repository import UserRepository
 from src.api.v1.user.service import user_service
+from src.core.constants import Environment
 from src.core.security import verify_password, create_access_token
 from src.core.exceptions import Unauthorized, BadRequest
 from src.core.database import AsyncSession
@@ -41,6 +42,7 @@ class AuthService:
             key="accessToken",
             value=token,
             httponly=True,
+            secure=False if settings.ENV is Environment.test else True
         )
 
         return response

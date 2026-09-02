@@ -123,3 +123,113 @@ class TestPostponedAuthenticated:
             f"/api/v1/group/otherdomain/postponed/{item.id}/media"
         )
         assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+class TestPostponedUpdate:
+    async def test_update_postponed_text_200(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        create_response = await client.post(
+            "/api/v1/group/testdomain/postponed/",
+            data={"text": "old text"},
+        )
+        assert create_response.status_code == 201
+        item_id = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()[0]["id"]
+
+        response = await client.put(
+            f"/api/v1/group/testdomain/postponed/{item_id}",
+            data={"text": "new text"},
+        )
+        assert response.status_code == 200
+
+        listed = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()
+        assert listed[0]["text"] == "new text"
+
+    async def test_update_postponed_empty_400(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        create_response = await client.post(
+            "/api/v1/group/testdomain/postponed/",
+            data={"text": "old text"},
+        )
+        assert create_response.status_code == 201
+        item_id = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()[0]["id"]
+
+        response = await client.put(
+            f"/api/v1/group/testdomain/postponed/{item_id}",
+            data={"text": "   "},
+        )
+        assert response.status_code == 400
+        assert "At least one" in response.json()["detail"]
+
+    async def test_update_postponed_wrong_domain_404(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        create_response = await client.post(
+            "/api/v1/group/testdomain/postponed/",
+            data={"text": "old text"},
+        )
+        assert create_response.status_code == 201
+        item_id = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()[0]["id"]
+
+        response = await client.put(
+            f"/api/v1/group/otherdomain/postponed/{item_id}",
+            data={"text": "new text"},
+        )
+        assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+class TestPostponedDelete:
+    async def test_delete_postponed_204(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        create_response = await client.post(
+            "/api/v1/group/testdomain/postponed/",
+            data={"text": "to delete"},
+        )
+        assert create_response.status_code == 201
+        item_id = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()[0]["id"]
+
+        response = await client.delete(
+            f"/api/v1/group/testdomain/postponed/{item_id}"
+        )
+        assert response.status_code == 204
+
+        listed = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()
+        assert listed == []
+
+    async def test_delete_postponed_wrong_domain_404(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        create_response = await client.post(
+            "/api/v1/group/testdomain/postponed/",
+            data={"text": "to delete"},
+        )
+        assert create_response.status_code == 201
+        item_id = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()[0]["id"]
+
+        response = await client.delete(
+            f"/api/v1/group/otherdomain/postponed/{item_id}"
+        )
+        assert response.status_code == 404
+
+        listed = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()
+        assert len(listed) == 1

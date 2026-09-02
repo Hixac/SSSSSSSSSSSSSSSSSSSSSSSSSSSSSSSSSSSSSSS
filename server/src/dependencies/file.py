@@ -5,7 +5,7 @@ import aiofiles
 from fastapi import UploadFile
 
 from src.core.exceptions import ContentTooLarge, UnsupportedMediaType
-from src.core.constants import MediaType
+from src.core.constants import ALLOWED_FORMATS, MediaType
 from src.core.config import settings
 from src.core.utilities import utc_now
 from src.schemas.file import ReadFile
@@ -14,9 +14,6 @@ from src.schemas.file import ReadFile
 class FileValidator:
     ALLOWED_SIZE = 1024 * 1024 * 10
     CHUNK_BYTES = 1024 * 1024
-
-    async def __call__(self, file: UploadFile) -> ReadFile:
-        return await self.validate_file(file)
 
     def _generate_filename(self, format: str) -> Path:
         return Path(settings.WHERE_TO_STORE_MEDIA / (utc_now().isoformat() + "." + format))
@@ -30,10 +27,13 @@ class FileValidator:
 
         content_type = file.content_type.split("/")
 
+        if content_type[1] not in ALLOWED_FORMATS:
+            raise UnsupportedMediaType("File not allowed with this type")
+
         try:
             type = MediaType(content_type[0])
         except ValueError:
-            raise UnsupportedMediaType("File not allowed with this type")
+            raise UnsupportedMediaType("File not allowed with this media type")
 
         filename = self._generate_filename(content_type[1])
         size = 0

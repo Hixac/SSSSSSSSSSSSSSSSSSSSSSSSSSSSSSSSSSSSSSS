@@ -14,7 +14,10 @@ class PostponedRepository(RepositoryBase[Postponed]):
         result = await self.session.execute(statement)
         return list(result.scalars().all())
 
-    async def get_by_id(self, id: UUID) -> Postponed | None:
-        statement = select(Postponed).where(Postponed.id == id)
+    async def get_by_id_and_domain(self, id: UUID, group_domain: str) -> Postponed | None:
+        statement = select(Postponed).where(
+            Postponed.id == id,
+            Postponed.group_domain == group_domain
+        )
         result = await self.session.execute(statement)
         return result.scalar_one_or_none()

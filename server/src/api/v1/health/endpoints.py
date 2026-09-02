@@ -17,6 +17,7 @@ async def health():
         "status": http_status,
         "version": settings.APP_VERSION,
         "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
+        "environment": settings.ENV.value
     }
 
     return JSONResponse(status_code=http_status, content=response)

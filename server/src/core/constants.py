@@ -18,3 +18,6 @@ class MediaType(StrEnum):
 class RoleType(StrEnum):
     admin = "admin"
     editor = "editor"
+
+
+ALLOWED_FORMATS = {"png", "jpg", "jpeg", "mp4"}

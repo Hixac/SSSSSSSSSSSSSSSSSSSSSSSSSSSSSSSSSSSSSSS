@@ -17,14 +17,14 @@ from src.core.database import (
     create_async_sessionmaker,
     create_sync_sessionmaker,
 )
-from src.core.logger import structlog  # TODO: fix logger
+from src.core.logger import get_logger
 from src.core.exception_handlers import add_exception_handlers
 
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 
-LOGGER = structlog.getLogger(__file__)
+LOGGER = get_logger(__name__)
 
 
 class State(TypedDict):

@@ -1,10 +1,10 @@
-from typing import Annotated, Any
+from typing import Annotated
 
-import structlog
 from starlette.responses import JSONResponse
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Response
 
 from src.core.database import AsyncSession, get_db_session
+from src.core.logger import get_logger
 from src.models.auth_session import AuthSession
 
 from .service import auth_service
@@ -12,7 +12,7 @@ from .schemas import AuthLoginSchema, AuthRegisterSchema, MeResponse
 from .dependencies import verify_user
 
 
-LOGGER = structlog.get_logger()
+LOGGER = get_logger(__name__)
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -59,16 +59,10 @@ async def logout(
     session: Annotated[AsyncSession, Depends(get_db_session)],
     auth_session: Annotated[AuthSession, Depends(verify_user)]
 ) -> JSONResponse:
+    response = await auth_service.logout(session, auth_session)
     response.delete_cookie(key="accessToken")
-    return await auth_service.logout(session, auth_session)
 
-
-@router.get("/cookies")
-async def cookies(
-    request: Request,
-    _: Annotated[AuthSession, Depends(verify_user)]
-) -> dict[str, Any]:
-    return request.cookies
+    return response
 
 
 @router.get("/me")

@@ -12,7 +12,7 @@ interface SnackbarState {
 
 export default function BoardPage() {
   const { t } = useTranslation();
-  const [domain, setDomain] = useState('fat_asslesd');
+  const [domain, setDomain] = useState('');
   const [tab, setTab] = useState(0);
   const [snackbar, setSnackbar] = useState<SnackbarState | null>(null);
 
@@ -23,19 +23,27 @@ export default function BoardPage() {
   return (
     <Stack spacing={3}>
       <GroupPanel currentDomain={domain} onDomainChange={setDomain} />
-      <Tabs
-        value={tab}
-        onChange={(_event, value: number) => setTab(value)}
-        variant="fullWidth"
-        sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
-      >
-        <Tab label={t('board.wallPosts')} />
-        <Tab label={t('board.postponed')} />
-      </Tabs>
-      {tab === 0 ? (
-        <Feed key={domain} domain={domain} />
+      {!domain ? (
+        <Alert severity="info" sx={{ borderRadius: 2 }}>
+          {t('group.enterDomainHint')}
+        </Alert>
       ) : (
-        <PostponedPanel domain={domain} onNotify={notify} />
+        <>
+          <Tabs
+            value={tab}
+            onChange={(_event, value: number) => setTab(value)}
+            variant="fullWidth"
+            sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
+          >
+            <Tab label={t('board.wallPosts')} />
+            <Tab label={t('board.postponed')} />
+          </Tabs>
+          {tab === 0 ? (
+            <Feed key={domain} domain={domain} />
+          ) : (
+            <PostponedPanel domain={domain} onNotify={notify} />
+          )}
+        </>
       )}
       <Snackbar
         open={snackbar !== null}
