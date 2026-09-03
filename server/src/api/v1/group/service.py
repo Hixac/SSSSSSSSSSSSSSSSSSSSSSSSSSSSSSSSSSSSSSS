@@ -50,12 +50,12 @@ class PostponedService:
         if item is None:
             return None
 
-        if text is not None and text == "" and (delete_media or item.media_path == ""):
-            raise BadRequest("Do you want to delete post instead?"
-                             if item.media_path != "" else
-                             "Can't delete text when media is empty. Do you want to delete post instead?")
-        if item.text == "" and delete_media:
-            raise BadRequest("Can't delete media when text is empty. Do you want to delete post instead?")
+        if text is not None and text == "" and delete_media:
+             raise BadRequest("Do you want to delete post instead?")
+        elif text is not None and text == "" and item.media_path == "":
+             raise BadRequest("Can't delete text when media is not present.\nDo you want to delete post instead?")
+        elif delete_media and text is None and item.text == "":
+             raise BadRequest("Can't delete media when text is empty.\nDo you want to delete post instead?")
 
         if text is not None:
             item.text = text

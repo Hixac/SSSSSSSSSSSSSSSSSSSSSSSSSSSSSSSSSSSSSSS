@@ -5,6 +5,9 @@ import GroupPanel from '../features/groups/group.panel';
 import Feed from '../features/feed/feed.component';
 import PostponedPanel from '../features/groups/postponed.panel';
 
+const DOMAIN_STORAGE_KEY = 'manyS.groupDomain';
+const TAB_STORAGE_KEY = 'manyS.boardTab';
+
 interface SnackbarState {
   message: string;
   severity: 'success' | 'error';
@@ -12,17 +15,32 @@ interface SnackbarState {
 
 export default function BoardPage() {
   const { t } = useTranslation();
-  const [domain, setDomain] = useState('');
-  const [tab, setTab] = useState(0);
+  const [domain, setDomain] = useState<string>(() => {
+    return localStorage.getItem(DOMAIN_STORAGE_KEY) ?? '';
+  });
+  const [tab, setTab] = useState<number>(() => {
+    const saved = Number(localStorage.getItem(TAB_STORAGE_KEY));
+    return saved === 1 ? 1 : 0;
+  });
   const [snackbar, setSnackbar] = useState<SnackbarState | null>(null);
 
   const notify = (message: string, severity: 'success' | 'error' = 'success') => {
     setSnackbar({ message, severity });
   };
 
+  const handleDomainChange = (nextDomain: string) => {
+    setDomain(nextDomain);
+    localStorage.setItem(DOMAIN_STORAGE_KEY, nextDomain);
+  };
+
+  const handleTabChange = (_event: unknown, value: number) => {
+    setTab(value);
+    localStorage.setItem(TAB_STORAGE_KEY, String(value));
+  };
+
   return (
     <Stack spacing={3}>
-      <GroupPanel currentDomain={domain} onDomainChange={setDomain} />
+      <GroupPanel currentDomain={domain} onDomainChange={handleDomainChange} />
       {!domain ? (
         <Alert severity="info" sx={{ borderRadius: 2 }}>
           {t('group.enterDomainHint')}
@@ -31,7 +49,7 @@ export default function BoardPage() {
         <>
           <Tabs
             value={tab}
-            onChange={(_event, value: number) => setTab(value)}
+            onChange={handleTabChange}
             variant="fullWidth"
             sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
           >
