@@ -8,7 +8,7 @@ from pydantic import AwareDatetime
 
 from src.core.database import AsyncSession, get_db_session
 from src.core.exceptions import BadRequest, ResourceNotFound
-from src.core.utilities import utc_now
+from src.core.utilities import utc_now_plus_hour, utc_now
 from src.dependencies.file import FileValidator
 from src.models.auth_session import AuthSession
 
@@ -27,7 +27,7 @@ async def create_postponed(
     domain: Annotated[str, Depends(validate_vk_domain)],
     text: Annotated[str, Form()] = "",
     media: Annotated[UploadFile | None, File()] = None,
-    scheduled: Annotated[AwareDatetime, Form(default_factory=utc_now)],
+    scheduled: Annotated[AwareDatetime, Form(default_factory=utc_now_plus_hour)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     auth_session: Annotated[AuthSession, Depends(verify_user)],
 ) -> JSONResponse:

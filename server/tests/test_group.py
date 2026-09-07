@@ -1,3 +1,6 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
@@ -6,6 +9,7 @@ from unittest.mock import AsyncMock
 from src.api.v1.group.service import postponed_service
 from src.api.v1.vk.service import vk_service
 from src.core.database import AsyncSession
+from src.core.utilities import utc_now_plus_hour
 
 
 @pytest_asyncio.fixture
@@ -115,7 +119,8 @@ class TestPostponedAuthenticated:
         item = await postponed_service.create(
             session,
             text="hello",
-            media_path=None,
+            media_path="",
+            scheduled=utc_now_plus_hour(),
             group_domain="testdomain",
         )
 
@@ -123,6 +128,21 @@ class TestPostponedAuthenticated:
             f"/api/v1/group/otherdomain/postponed/{item.id}/media"
         )
         assert response.status_code == 404
+
+    async def test_postponed_wrong_schedule_400(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        response = await client.post(
+            url="/api/v1/group/otherdomain/postponed/",
+            data={
+                "text": "hello",
+                "media_path": "",
+                "scheduled": datetime(year=2000, month=1, day=20, tzinfo=ZoneInfo("Asia/Tokyo")).isoformat(),
+                "group_domain": "testdomain",
+            }
+        )
+        assert response.status_code == 400
+        assert "Can't schedule in the past" == response.json()['detail']
 
 
 @pytest.mark.asyncio
@@ -167,7 +187,7 @@ class TestPostponedUpdate:
             data={"text": "   "},
         )
         assert response.status_code == 400
-        assert "At least one" in response.json()["detail"]
+        assert "Can't delete text when media is not present.\nDo you want to delete post instead?" == response.json()["detail"]
 
     async def test_update_postponed_wrong_domain_404(
         self, client: AsyncClient, authenticated: None,
@@ -186,6 +206,26 @@ class TestPostponedUpdate:
             data={"text": "new text"},
         )
         assert response.status_code == 404
+
+
+    async def test_postponed_wrong_schedule_400(
+        self, client: AsyncClient, authenticated: None,
+    ) -> None:
+        create_response = await client.post(
+            "/api/v1/group/testdomain/postponed/",
+            data={"text": "some ass text"},
+        )
+        assert create_response.status_code == 201
+        item_id = (
+            await client.get("/api/v1/group/testdomain/postponed/")
+        ).json()[0]["id"]
+
+        response = await client.put(
+            f"/api/v1/group/testdomain/postponed/{item_id}",
+            data={"scheduled": datetime(year=2000, month=1, day=20, tzinfo=ZoneInfo("Asia/Tokyo")).isoformat()},
+        )
+        assert response.status_code == 400
+        assert "Can't schedule in the past" == response.json()['detail']
 
 
 @pytest.mark.asyncio
