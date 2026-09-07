@@ -1,8 +1,12 @@
 from pathlib import Path
 from uuid import UUID
+from datetime import UTC, datetime
+
+from pydantic import AwareDatetime
 
 from src.core.database import AsyncSession
 from src.core.exceptions import BadRequest
+from src.core.utilities import utc_now
 from src.models.postponed import Postponed
 
 from .repository import PostponedRepository
@@ -15,12 +19,14 @@ class PostponedService:
         *,
         text: str,
         media_path: str,
+        scheduled: datetime,
         group_domain: str,
     ) -> Postponed:
         repo = PostponedRepository.from_session(session)
         return await repo.create(Postponed(
             text=text,
             media_path=media_path,
+            scheduled=scheduled,
             group_domain=group_domain,
         ), flush=True)
 
@@ -44,24 +50,30 @@ class PostponedService:
         group_domain: str,
         text: str | None,
         media_path: str,
-        delete_media: bool
+        delete_media: bool,
+        scheduled: AwareDatetime | None
     ) -> Postponed | None:
         item = await self.get_by_id_and_domain(session, id, group_domain)
         if item is None:
             return None
 
         if text is not None and text == "" and delete_media:
-             raise BadRequest("Do you want to delete post instead?")
+            raise BadRequest("Do you want to delete post instead?")
         elif text is not None and text == "" and item.media_path == "":
-             raise BadRequest("Can't delete text when media is not present.\nDo you want to delete post instead?")
+            raise BadRequest("Can't delete text when media is not present.\nDo you want to delete post instead?")
         elif delete_media and text is None and item.text == "":
-             raise BadRequest("Can't delete media when text is empty.\nDo you want to delete post instead?")
+            raise BadRequest("Can't delete media when text is empty.\nDo you want to delete post instead?")
+
+        if scheduled is not None and scheduled.astimezone(UTC) < utc_now():
+            raise BadRequest("Can't schedule in the past")
 
         if text is not None:
             item.text = text
         if media_path != "":
             self._remove_file(item.media_path)
             item.media_path = media_path
+        if scheduled is not None:
+            item.scheduled = scheduled
 
         if delete_media:
             self._remove_file(item.media_path)

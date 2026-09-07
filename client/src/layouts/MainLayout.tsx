@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

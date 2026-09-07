@@ -25,7 +25,8 @@ const en = {
     group: 'Group',
     domain: 'VK group domain',
     load: 'Load',
-    enterDomainHint: 'Enter a VK group domain to see its wall and postponed posts.',
+    enterDomainHint:
+      'Enter a VK group domain to see its wall and postponed posts.',
   },
   feed: {
     noPosts: 'No posts found for this group.',

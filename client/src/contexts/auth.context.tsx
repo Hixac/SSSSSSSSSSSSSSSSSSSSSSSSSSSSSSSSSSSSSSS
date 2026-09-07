@@ -1,5 +1,16 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { loginRequest, logoutRequest, meRequest, registerRequest } from '../api/auth';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+import {
+  loginRequest,
+  logoutRequest,
+  meRequest,
+  registerRequest,
+} from '../api/auth';
 import type { User } from '../types';
 
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
@@ -14,7 +25,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<AuthStatus>('loading');
 

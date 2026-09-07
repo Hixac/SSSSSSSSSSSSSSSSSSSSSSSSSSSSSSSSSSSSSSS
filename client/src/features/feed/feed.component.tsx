@@ -25,7 +25,11 @@ function FeedSkeleton() {
       <CardContent>
         <Skeleton variant="circular" width={40} height={40} />
         <Skeleton variant="text" width="30%" sx={{ mt: 1 }} />
-        <Skeleton variant="rectangular" height={200} sx={{ my: 1, borderRadius: 2 }} />
+        <Skeleton
+          variant="rectangular"
+          height={200}
+          sx={{ my: 1, borderRadius: 2 }}
+        />
         <Skeleton variant="text" width="50%" />
       </CardContent>
     </Card>
@@ -147,7 +151,11 @@ export default function Feed({ domain }: { domain: string }) {
   return (
     <Stack spacing={2}>
       {posts.map((post, index) => (
-        <PostCard key={`${post.timestamp}-${index}`} post={post} group={group} />
+        <PostCard
+          key={`${post.timestamp}-${index}`}
+          post={post}
+          group={group}
+        />
       ))}
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
         {loadingMore ? (

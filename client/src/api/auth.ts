@@ -1,11 +1,17 @@
 import { api } from './client';
 import type { User } from '../types';
 
-export async function loginRequest(email: string, password: string): Promise<void> {
+export async function loginRequest(
+  email: string,
+  password: string
+): Promise<void> {
   await api.post('/auth/login', { email, password });
 }
 
-export async function registerRequest(email: string, password: string): Promise<void> {
+export async function registerRequest(
+  email: string,
+  password: string
+): Promise<void> {
   await api.post('/auth/register', { email, password });
 }
 

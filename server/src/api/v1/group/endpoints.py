@@ -1,11 +1,14 @@
+from datetime import UTC
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
+from pydantic import AwareDatetime
 
 from src.core.database import AsyncSession, get_db_session
 from src.core.exceptions import BadRequest, ResourceNotFound
+from src.core.utilities import utc_now
 from src.dependencies.file import FileValidator
 from src.models.auth_session import AuthSession
 
@@ -24,11 +27,15 @@ async def create_postponed(
     domain: Annotated[str, Depends(validate_vk_domain)],
     text: Annotated[str, Form()] = "",
     media: Annotated[UploadFile | None, File()] = None,
+    scheduled: Annotated[AwareDatetime, Form(default_factory=utc_now)],
     session: Annotated[AsyncSession, Depends(get_db_session)],
     auth_session: Annotated[AuthSession, Depends(verify_user)],
 ) -> JSONResponse:
     if text == "" and (media is None or media.filename is None):
         raise BadRequest("At least one of text or media is required")
+
+    if scheduled.astimezone(UTC) < utc_now():
+        raise BadRequest("Can't schedule in the past")
 
     media_path: str = ""
     if media is not None and media.filename is not None:
@@ -39,6 +46,7 @@ async def create_postponed(
         session,
         text=text,
         media_path=media_path,
+        scheduled=scheduled,
         group_domain=domain,
     )
 
@@ -69,6 +77,7 @@ async def update_postponed(
     text: Annotated[str | None, Form()] = None,
     media: Annotated[UploadFile | None, File()] = None,
     delete_media: Annotated[bool, Form()] = False,
+    scheduled: Annotated[AwareDatetime | None, Form()] = None,
     session: Annotated[AsyncSession, Depends(get_db_session)],
     auth_session: Annotated[AuthSession, Depends(verify_user)],
 ) -> JSONResponse:
@@ -88,7 +97,8 @@ async def update_postponed(
         group_domain=domain,
         text=normalized_text,
         media_path=media_path,
-        delete_media=delete_media
+        delete_media=delete_media,
+        scheduled=scheduled
     )
 
     if item is None:

@@ -9,7 +9,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { FavoriteBorder, PushPin, Repeat, Visibility } from '@mui/icons-material';
+import {
+  FavoriteBorder,
+  PushPin,
+  Repeat,
+  Visibility,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '../../i18n/format';
 import type { VKGroup, VKPost } from '../../types';

@@ -4,7 +4,7 @@
  */
 export function formatDateTime(
   value: string | number | Date,
-  language: string,
+  language: string
 ): string {
   const locale = language === 'ru' ? 'ru-RU' : 'en-US';
   return new Intl.DateTimeFormat(locale, {

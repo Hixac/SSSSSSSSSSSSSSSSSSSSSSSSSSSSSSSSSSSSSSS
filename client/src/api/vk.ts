@@ -11,7 +11,7 @@ export async function getGroupInfo(domain: string): Promise<VKGroup> {
 export async function getWallPosts(
   domain: string,
   count: number = 20,
-  offset: number = 0,
+  offset: number = 0
 ): Promise<VKPost[]> {
   const response = await api.get<VKPost[]>('/vk/wall', {
     params: { domain, count, offset },

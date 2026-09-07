@@ -24,7 +24,10 @@ export default function BoardPage() {
   });
   const [snackbar, setSnackbar] = useState<SnackbarState | null>(null);
 
-  const notify = (message: string, severity: 'success' | 'error' = 'success') => {
+  const notify = (
+    message: string,
+    severity: 'success' | 'error' = 'success'
+  ) => {
     setSnackbar({ message, severity });
   };
 

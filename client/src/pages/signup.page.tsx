@@ -78,7 +78,11 @@ export default function SignupPage() {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t('auth.signupSubtitle')}
         </Typography>
-        <Box component="form" onSubmit={(event) => void handleSubmit(event)} noValidate>
+        <Box
+          component="form"
+          onSubmit={(event) => void handleSubmit(event)}
+          noValidate
+        >
           <Stack spacing={2}>
             <TextField
               label={t('auth.email')}
@@ -114,7 +118,12 @@ export default function SignupPage() {
               autoComplete="new-password"
             />
             {error && <Alert severity="error">{error}</Alert>}
-            <Button type="submit" variant="contained" size="large" loading={submitting}>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              loading={submitting}
+            >
               {t('auth.signUp')}
             </Button>
             <Typography variant="body2" align="center">

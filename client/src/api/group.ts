@@ -2,14 +2,16 @@ import { api } from './client';
 import type { PostponedItem } from '../types';
 
 export async function listPostponed(domain: string): Promise<PostponedItem[]> {
-  const response = await api.get<PostponedItem[]>(`/group/${domain}/postponed/`);
+  const response = await api.get<PostponedItem[]>(
+    `/group/${domain}/postponed/`
+  );
   return response.data;
 }
 
 export async function createPostponed(
   domain: string,
   text: string,
-  file: File | null,
+  file: File | null
 ): Promise<void> {
   const form = new FormData();
   if (text.trim()) {
@@ -26,7 +28,7 @@ export async function updatePostponed(
   id: string,
   text: string,
   file: File | null,
-  deleteMedia = false,
+  deleteMedia = false
 ): Promise<void> {
   const form = new FormData();
   form.append('text', text.trim());
@@ -41,7 +43,7 @@ export async function updatePostponed(
 
 export async function deletePostponed(
   domain: string,
-  id: string,
+  id: string
 ): Promise<void> {
   await api.delete(`/group/${domain}/postponed/${id}`);
 }

@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, CardContent, Stack, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardContent,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 interface GroupPanelProps {
@@ -7,7 +14,10 @@ interface GroupPanelProps {
   onDomainChange: (domain: string) => void;
 }
 
-export default function GroupPanel({ currentDomain, onDomainChange }: GroupPanelProps) {
+export default function GroupPanel({
+  currentDomain,
+  onDomainChange,
+}: GroupPanelProps) {
   const { t } = useTranslation();
   const [input, setInput] = useState(currentDomain);
 

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import {
   Alert,
   Box,
@@ -28,7 +28,7 @@ export default function LoginPage() {
     return <Navigate to="/board" replace />;
   }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     if (!email.trim() || !password) {
@@ -68,7 +68,11 @@ export default function LoginPage() {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t('auth.signInSubtitle')}
         </Typography>
-        <Box component="form" onSubmit={(event) => void handleSubmit(event)} noValidate>
+        <Box
+          component="form"
+          onSubmit={(event) => void handleSubmit(event)}
+          noValidate
+        >
           <Stack spacing={2}>
             <TextField
               label={t('auth.email')}
@@ -90,7 +94,12 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
             {error && <Alert severity="error">{error}</Alert>}
-            <Button type="submit" variant="contained" size="large" loading={submitting}>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              loading={submitting}
+            >
               {t('auth.signIn')}
             </Button>
             <Typography variant="body2" align="center">

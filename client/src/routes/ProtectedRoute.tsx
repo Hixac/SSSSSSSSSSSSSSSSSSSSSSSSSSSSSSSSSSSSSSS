@@ -7,7 +7,14 @@ export default function ProtectedRoute() {
 
   if (status === 'loading') {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <CircularProgress />
       </Box>
     );

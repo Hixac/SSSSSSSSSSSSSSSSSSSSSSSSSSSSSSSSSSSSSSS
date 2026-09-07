@@ -13,6 +13,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import 'dayjs/locale/ru'; import 'dayjs/locale/en-gb';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -43,10 +46,16 @@ function mediaUrl(item: PostponedItem): string {
 }
 
 function mediaName(item: PostponedItem): string {
-  return item.media_path ? item.media_path.split('/').pop() ?? '' : '';
+  return item.media_path ? (item.media_path.split('/').pop() ?? '') : '';
 }
 
-function VideoPreview({ src, crossOrigin }: { src: string; crossOrigin?: 'use-credentials' }) {
+function VideoPreview({
+  src,
+  crossOrigin,
+}: {
+  src: string;
+  crossOrigin?: 'use-credentials';
+}) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [frame, setFrame] = useState<string | null>(null);
@@ -132,7 +141,11 @@ function MediaThumbnail({ item }: { item: PostponedItem }) {
       }}
     >
       {VIDEO_EXTENSIONS.test(item.media_path) ? (
-        <VideoPreview key={item.media_path} src={mediaUrl(item)} crossOrigin="use-credentials" />
+        <VideoPreview
+          key={item.media_path}
+          src={mediaUrl(item)}
+          crossOrigin="use-credentials"
+        />
       ) : (
         <img
           src={mediaUrl(item)}
@@ -146,7 +159,10 @@ function MediaThumbnail({ item }: { item: PostponedItem }) {
   );
 }
 
-export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps) {
+export default function PostponedPanel({
+  domain,
+  onNotify,
+}: PostponedPanelProps) {
   const { t, i18n } = useTranslation();
   const [items, setItems] = useState<PostponedItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,14 +201,17 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
     setCreatePreviewUrl(url);
   };
 
-  useEffect(() => () => {
-    if (editPreviewUrlRef.current) {
-      URL.revokeObjectURL(editPreviewUrlRef.current);
-    }
-    if (createPreviewUrlRef.current) {
-      URL.revokeObjectURL(createPreviewUrlRef.current);
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (editPreviewUrlRef.current) {
+        URL.revokeObjectURL(editPreviewUrlRef.current);
+      }
+      if (createPreviewUrlRef.current) {
+        URL.revokeObjectURL(createPreviewUrlRef.current);
+      }
+    },
+    []
+  );
 
   const load = async () => {
     setLoading(true);
@@ -254,7 +273,10 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
     event.preventDefault();
     setCreateDragOver(false);
     const dropped = event.dataTransfer.files?.[0] ?? null;
-    if (dropped && (dropped.type.startsWith('image/') || dropped.type.startsWith('video/'))) {
+    if (
+      dropped &&
+      (dropped.type.startsWith('image/') || dropped.type.startsWith('video/'))
+    ) {
       chooseCreateFile(dropped);
     }
   };
@@ -263,7 +285,10 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
     event.preventDefault();
     setEditDragOver(false);
     const dropped = event.dataTransfer.files?.[0] ?? null;
-    if (dropped && (dropped.type.startsWith('image/') || dropped.type.startsWith('video/'))) {
+    if (
+      dropped &&
+      (dropped.type.startsWith('image/') || dropped.type.startsWith('video/'))
+    ) {
       chooseEditFile(dropped);
     }
   };
@@ -287,7 +312,13 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
   const handleSave = async (item: PostponedItem) => {
     setSaving(true);
     try {
-      await updatePostponed(domain, item.id, editText, editFile, editRemoveMedia);
+      await updatePostponed(
+        domain,
+        item.id,
+        editText,
+        editFile,
+        editRemoveMedia
+      );
       cancelEditing();
       onNotify(t('postponed.updated'));
       await load();
@@ -343,8 +374,35 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
               transition: 'border-color 0.2s',
             }}
           >
-            <Stack direction="row" spacing={1} alignItems="center">
-              {createPreviewUrl && file && (file.type.startsWith('image/') || file.type.startsWith('video/')) && (
+            <Button
+              component="label"
+              variant="outlined"
+              size="small"
+              startIcon={<AttachFileIcon />}
+            >
+              {t('postponed.attachMedia')}
+              <input
+                key={file ? file.name : 'empty'}
+                type="file"
+                hidden
+                accept="image/png,image/jpeg,video/mp4"
+                onChange={(event) =>
+                  chooseCreateFile(event.target.files?.[0] ?? null)
+                }
+              />
+            </Button>
+          </Box>
+          <LocalizationProvider 
+            dateAdapter={AdapterDayjs} 
+            adapterLocale={i18n.language === 'ru' ? 'ru' : 'en-gb'}
+          >
+            <DatePicker />
+          </LocalizationProvider>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {createPreviewUrl &&
+              file &&
+              (file.type.startsWith('image/') ||
+                file.type.startsWith('video/')) && (
                 <Stack spacing={0.5} alignItems="center" sx={{ flexShrink: 0 }}>
                   <Box
                     sx={{
@@ -357,12 +415,19 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
                     }}
                   >
                     {file.type.startsWith('video/') ? (
-                      <VideoPreview key={createPreviewUrl} src={createPreviewUrl} />
+                      <VideoPreview
+                        key={createPreviewUrl}
+                        src={createPreviewUrl}
+                      />
                     ) : (
                       <img
                         src={createPreviewUrl}
                         alt="new media"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
                       />
                     )}
                     <IconButton
@@ -386,24 +451,12 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
                   </Typography>
                 </Stack>
               )}
-              <Button
-                component="label"
-                variant="outlined"
-                size="small"
-                startIcon={<AttachFileIcon />}
-              >
-                {t('postponed.attachMedia')}
-                <input
-                  key={file ? file.name : 'empty'}
-                  type="file"
-                  hidden
-                  accept="image/png,image/jpeg,video/mp4"
-                  onChange={(event) => chooseCreateFile(event.target.files?.[0] ?? null)}
-                />
-              </Button>
-            </Stack>
-          </Box>
-          {error && <Typography color="error" variant="body2">{error}</Typography>}
+          </Stack>
+          {error && (
+            <Typography color="error" variant="body2">
+              {error}
+            </Typography>
+          )}
           <Button
             variant="contained"
             startIcon={<ScheduleIcon />}
@@ -458,86 +511,116 @@ export default function PostponedPanel({ domain, onNotify }: PostponedPanelProps
                       }}
                     >
                       <Stack direction="row" spacing={1} alignItems="center">
-                      {((editPreviewUrl && editFile && (editFile.type.startsWith('image/') || editFile.type.startsWith('video/'))) ||
-                        (item.media_path && !editRemoveMedia)) && (
-                        <Stack spacing={0.5} alignItems="center" sx={{ flexShrink: 0 }}>
-                          <Box
-                            sx={{
-                              position: 'relative',
-                              width: 72,
-                              height: 72,
-                              borderRadius: 2,
-                              overflow: 'hidden',
-                              bgcolor: '#eef0f4',
-                            }}
+                        {((editPreviewUrl &&
+                          editFile &&
+                          (editFile.type.startsWith('image/') ||
+                            editFile.type.startsWith('video/'))) ||
+                          (item.media_path && !editRemoveMedia)) && (
+                          <Stack
+                            spacing={0.5}
+                            alignItems="center"
+                            sx={{ flexShrink: 0 }}
                           >
-                            {editFile ? (
-                              editFile.type.startsWith('video/') && editPreviewUrl ? (
-                                <VideoPreview key={editPreviewUrl} src={editPreviewUrl} />
-                              ) : (
-                                <img
-                                  src={editPreviewUrl ?? undefined}
-                                  alt="new media"
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                />
-                              )
-                            ) : item.media_path && VIDEO_EXTENSIONS.test(item.media_path) ? (
-                              <VideoPreview key={item.media_path} src={mediaUrl(item)} crossOrigin="use-credentials" />
-                            ) : (
-                              <img
-                                src={mediaUrl(item)}
-                                alt="attached media"
-                                crossOrigin="use-credentials"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              />
-                            )}
-                            <IconButton
-                              size="small"
-                              onClick={handleRemoveMedia}
-                              aria-label={t('postponed.removeMedia')}
+                            <Box
                               sx={{
-                                position: 'absolute',
-                                top: 2,
-                                right: 2,
-                                bgcolor: 'rgba(0,0,0,0.55)',
-                                color: '#fff',
-                                '&:hover': { bgcolor: 'rgba(0,0,0,0.75)' },
+                                position: 'relative',
+                                width: 72,
+                                height: 72,
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                bgcolor: '#eef0f4',
                               }}
                             >
-                              <CloseIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
-                          </Box>
-                          <Typography variant="caption" noWrap sx={{ maxWidth: 72 }}>
-                            {editFile ? editFile.name : mediaName(item)}
-                          </Typography>
-                        </Stack>
-                      )}
-                      <Button
-                        component="label"
-                        variant="outlined"
-                        size="small"
-                        startIcon={<AttachFileIcon />}
-                      >
-                        {t('postponed.attachMedia')}
-                        <input
-                          key={editFile ? editFile.name : 'empty'}
-                          type="file"
-                          hidden
-                          accept="image/png,image/jpeg,video/mp4"
-                          onChange={(event) => chooseEditFile(event.target.files?.[0] ?? null)}
-                        />
-                      </Button>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => void handleSave(item)}
-                        loading={saving}
-                      >
-                        {t('postponed.save')}
-                      </Button>
-                      <Button size="small" onClick={cancelEditing}>
-                        {t('postponed.cancel')}
-                      </Button>
+                              {editFile ? (
+                                editFile.type.startsWith('video/') &&
+                                editPreviewUrl ? (
+                                  <VideoPreview
+                                    key={editPreviewUrl}
+                                    src={editPreviewUrl}
+                                  />
+                                ) : (
+                                  <img
+                                    src={editPreviewUrl ?? undefined}
+                                    alt="new media"
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'cover',
+                                    }}
+                                  />
+                                )
+                              ) : item.media_path &&
+                                VIDEO_EXTENSIONS.test(item.media_path) ? (
+                                <VideoPreview
+                                  key={item.media_path}
+                                  src={mediaUrl(item)}
+                                  crossOrigin="use-credentials"
+                                />
+                              ) : (
+                                <img
+                                  src={mediaUrl(item)}
+                                  alt="attached media"
+                                  crossOrigin="use-credentials"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                  }}
+                                />
+                              )}
+                              <IconButton
+                                size="small"
+                                onClick={handleRemoveMedia}
+                                aria-label={t('postponed.removeMedia')}
+                                sx={{
+                                  position: 'absolute',
+                                  top: 2,
+                                  right: 2,
+                                  bgcolor: 'rgba(0,0,0,0.55)',
+                                  color: '#fff',
+                                  '&:hover': { bgcolor: 'rgba(0,0,0,0.75)' },
+                                }}
+                              >
+                                <CloseIcon sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            </Box>
+                            <Typography
+                              variant="caption"
+                              noWrap
+                              sx={{ maxWidth: 72 }}
+                            >
+                              {editFile ? editFile.name : mediaName(item)}
+                            </Typography>
+                          </Stack>
+                        )}
+                        <Button
+                          component="label"
+                          variant="outlined"
+                          size="small"
+                          startIcon={<AttachFileIcon />}
+                        >
+                          {t('postponed.attachMedia')}
+                          <input
+                            key={editFile ? editFile.name : 'empty'}
+                            type="file"
+                            hidden
+                            accept="image/png,image/jpeg,video/mp4"
+                            onChange={(event) =>
+                              chooseEditFile(event.target.files?.[0] ?? null)
+                            }
+                          />
+                        </Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => void handleSave(item)}
+                          loading={saving}
+                        >
+                          {t('postponed.save')}
+                        </Button>
+                        <Button size="small" onClick={cancelEditing}>
+                          {t('postponed.cancel')}
+                        </Button>
                       </Stack>
                     </Box>
                   </Stack>
