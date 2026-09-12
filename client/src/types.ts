@@ -25,4 +25,5 @@ export interface PostponedItem {
   media_path: string | null;
   group_domain: string;
   created_at: string;
+  scheduled: string;
 }

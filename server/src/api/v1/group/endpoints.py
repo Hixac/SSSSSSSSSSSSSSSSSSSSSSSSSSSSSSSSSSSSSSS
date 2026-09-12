@@ -24,7 +24,7 @@ router = APIRouter(prefix="/group", tags=["group"])
 @router.post("/{domain}/postponed/", status_code=201)
 async def create_postponed(
     *,
-    domain: Annotated[str, Depends(validate_vk_domain)],
+    domain: str,
     text: Annotated[str, Form()] = "",
     media: Annotated[UploadFile | None, File()] = None,
     scheduled: Annotated[AwareDatetime, Form(default_factory=utc_now_plus_hour)],
@@ -142,6 +142,7 @@ async def list_postponed(
             media_path=item.media_path,
             group_domain=item.group_domain,
             created_at=item.created_at.isoformat(),
+            scheduled=item.scheduled.isoformat()
         )
         for item in items
     ]

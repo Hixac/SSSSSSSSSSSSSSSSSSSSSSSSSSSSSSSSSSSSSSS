@@ -59,6 +59,7 @@ const en = {
   errors: {
     requestFailed: 'Request failed ({{status}})',
     unexpected: 'Unexpected error',
+    login: 'Wrong email or password',
   },
 };
 

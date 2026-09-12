@@ -10,11 +10,17 @@ import {
   ListItem,
   ListItemText,
   Stack,
+  Grid,
   TextField,
   Typography,
 } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import 'dayjs/locale/ru'; import 'dayjs/locale/en-gb';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import type { Dayjs } from 'dayjs';
+import 'dayjs/locale/ru';
+import 'dayjs/locale/en-gb';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -33,6 +39,9 @@ import {
 import { errorMessage } from '../../api/client';
 import { formatDateTime } from '../../i18n/format';
 import type { PostponedItem } from '../../types';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface PostponedPanelProps {
   domain: string;
@@ -168,6 +177,7 @@ export default function PostponedPanel({
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -237,9 +247,10 @@ export default function PostponedPanel({
     }
     setSubmitting(true);
     try {
-      await createPostponed(domain, text, file);
+      await createPostponed(domain, text, file, date);
       setText('');
       setFile(null);
+      setDate(null);
       setCreatePreview(null);
       onNotify(t('postponed.created'));
       await load();
@@ -317,7 +328,8 @@ export default function PostponedPanel({
         item.id,
         editText,
         editFile,
-        editRemoveMedia
+        editRemoveMedia,
+        date
       );
       cancelEditing();
       onNotify(t('postponed.updated'));
@@ -359,45 +371,50 @@ export default function PostponedPanel({
             minRows={2}
             maxRows={6}
           />
-          <Box
-            onDragOver={(event) => {
-              event.preventDefault();
-              setCreateDragOver(true);
-            }}
-            onDragLeave={() => setCreateDragOver(false)}
-            onDrop={handleCreateDrop}
-            sx={{
-              border: '2px dashed',
-              borderColor: createDragOver ? 'primary.main' : 'divider',
-              borderRadius: 2,
-              p: 1,
-              transition: 'border-color 0.2s',
-            }}
-          >
-            <Button
-              component="label"
-              variant="outlined"
-              size="small"
-              startIcon={<AttachFileIcon />}
+          <Grid container spacing={2}>
+            <Box
+              onDragOver={(event) => {
+                event.preventDefault();
+                setCreateDragOver(true);
+              }}
+              onDragLeave={() => setCreateDragOver(false)}
+              onDrop={handleCreateDrop}
+              sx={{
+                border: '2px dashed',
+                borderColor: createDragOver ? 'primary.main' : 'divider',
+                borderRadius: 2,
+                p: 1,
+                transition: 'border-color 0.2s',
+              }}
             >
-              {t('postponed.attachMedia')}
-              <input
-                key={file ? file.name : 'empty'}
-                type="file"
-                hidden
-                accept="image/png,image/jpeg,video/mp4"
-                onChange={(event) =>
-                  chooseCreateFile(event.target.files?.[0] ?? null)
-                }
+              <Button
+                component="label"
+                variant="outlined"
+                size="small"
+                startIcon={<AttachFileIcon />}
+              >
+                {t('postponed.attachMedia')}
+                <input
+                  key={file ? file.name : 'empty'}
+                  type="file"
+                  hidden
+                  accept="image/png,image/jpeg,video/mp4"
+                  onChange={(event) =>
+                    chooseCreateFile(event.target.files?.[0] ?? null)
+                  }
+                />
+              </Button>
+            </Box>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={i18n.language === 'ru' ? 'ru' : 'en-gb'}
+            >
+              <DateTimePicker
+                value={date}
+                onChange={(newDate) => setDate(newDate)}
               />
-            </Button>
-          </Box>
-          <LocalizationProvider 
-            dateAdapter={AdapterDayjs} 
-            adapterLocale={i18n.language === 'ru' ? 'ru' : 'en-gb'}
-          >
-            <DatePicker />
-          </LocalizationProvider>
+            </LocalizationProvider>
+          </Grid>
           <Stack direction="row" spacing={1} alignItems="center">
             {createPreviewUrl &&
               file &&
@@ -628,7 +645,7 @@ export default function PostponedPanel({
                   <>
                     <ListItemText
                       primary={item.text ?? t('postponed.mediaOnly')}
-                      secondary={formatDateTime(item.created_at, i18n.language)}
+                      secondary={"На " + formatDateTime(item.scheduled, i18n.language)}
                     />
                     <IconButton
                       size="small"

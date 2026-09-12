@@ -7,3 +7,4 @@ class PostponedResponse(BaseModel):
     media_path: str
     group_domain: str
     created_at: str
+    scheduled: str

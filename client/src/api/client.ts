@@ -10,8 +10,14 @@ export const api = axios.create({
 export function errorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     const detail = error.response?.data?.detail;
+    const error_string = error.response?.data?.error;
     if (typeof detail === 'string') {
-      return detail;
+      switch (error_string) {
+        case 'Unauthorized':
+          return i18n.t('errors.login');
+        default:
+          return detail;
+      }
     }
     if (Array.isArray(detail) && detail.length > 0) {
       const first = detail[0];

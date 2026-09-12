@@ -1,5 +1,6 @@
 import { api } from './client';
 import type { PostponedItem } from '../types';
+import type { Dayjs } from 'dayjs';
 
 export async function listPostponed(domain: string): Promise<PostponedItem[]> {
   const response = await api.get<PostponedItem[]>(
@@ -11,7 +12,8 @@ export async function listPostponed(domain: string): Promise<PostponedItem[]> {
 export async function createPostponed(
   domain: string,
   text: string,
-  file: File | null
+  file: File | null,
+  date: Dayjs | null
 ): Promise<void> {
   const form = new FormData();
   if (text.trim()) {
@@ -19,6 +21,9 @@ export async function createPostponed(
   }
   if (file) {
     form.append('media', file);
+  }
+  if (date) {
+    form.append('scheduled', date.toISOString());
   }
   await api.post(`/group/${domain}/postponed/`, form);
 }
@@ -28,7 +33,8 @@ export async function updatePostponed(
   id: string,
   text: string,
   file: File | null,
-  deleteMedia = false
+  deleteMedia = false,
+  date: Dayjs | null
 ): Promise<void> {
   const form = new FormData();
   form.append('text', text.trim());
@@ -37,6 +43,9 @@ export async function updatePostponed(
   }
   if (deleteMedia) {
     form.append('delete_media', 'true');
+  }
+  if (date) {
+    form.append('scheduled', date.toISOString());
   }
   await api.put(`/group/${domain}/postponed/${id}`, form);
 }

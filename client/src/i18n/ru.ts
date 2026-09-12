@@ -61,6 +61,7 @@ const ru: Translation = {
   errors: {
     requestFailed: 'Ошибка запроса ({{status}})',
     unexpected: 'Неожиданная ошибка',
+    login: 'Неправильная почта или пароль',
   },
 };
 
