@@ -43,6 +43,8 @@ const ru: Translation = {
     title: 'Отложенные записи',
     text: 'Текст',
     attachMedia: 'Прикрепить медиа',
+    scheduleFor: 'Запланировать на',
+    dropHint: 'или перетащите файл',
     removeFile: 'Убрать файл',
     removeMedia: 'Убрать медиа',
     schedule: 'Запланировать',

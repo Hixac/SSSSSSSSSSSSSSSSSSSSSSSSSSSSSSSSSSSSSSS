@@ -41,6 +41,8 @@ const en = {
     title: 'Postponed posts',
     text: 'Text',
     attachMedia: 'Attach media',
+    scheduleFor: 'Schedule for',
+    dropHint: 'or drag and drop',
     removeFile: 'Remove file',
     removeMedia: 'Remove media',
     schedule: 'Schedule',
