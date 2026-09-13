@@ -24,8 +24,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import InboxIcon from '@mui/icons-material/Inbox';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
-import { deletePostponed, listPostponed, updatePostponed } from '../../api/group';
+import {
+  deletePostponed,
+  listPostponed,
+  updatePostponed,
+} from '../../api/group';
 import { errorMessage } from '../../api/client';
 import { formatDateTime } from '../../i18n/format';
 import type { PostponedItem } from '../../types';
@@ -33,10 +38,10 @@ import type { NotifyFn } from './postponed.types';
 import { VIDEO_EXTENSIONS, mediaName, mediaUrl } from './postponed.media';
 import { MediaThumbnail } from './postponed.media-thumbnail';
 import { VideoPreview } from './postponed.video-preview';
+import { SchedulePicker } from './postponed.schedule-picker';
 
 export interface PostponedListProps {
   domain: string;
-  date: Dayjs | null;
   refreshToken: number;
   onNotify: NotifyFn;
 }
@@ -47,7 +52,6 @@ function byScheduledAsc(a: PostponedItem, b: PostponedItem): number {
 
 export const PostponedList = memo(function PostponedList({
   domain,
-  date,
   refreshToken,
   onNotify,
 }: PostponedListProps) {
@@ -57,6 +61,7 @@ export const PostponedList = memo(function PostponedList({
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
+  const [editDate, setEditDate] = useState<Dayjs | null>(null);
   const [editFile, setEditFile] = useState<File | null>(null);
   const [editPreviewUrl, setEditPreviewUrl] = useState<string | null>(null);
   const [editRemoveMedia, setEditRemoveMedia] = useState(false);
@@ -127,6 +132,7 @@ export const PostponedList = memo(function PostponedList({
   const startEditing = (item: PostponedItem) => {
     setEditingId(item.id);
     setEditText(item.text ?? '');
+    setEditDate(dayjs(item.scheduled));
     setEditFile(null);
     setEditPreview(null);
     setEditRemoveMedia(false);
@@ -135,6 +141,7 @@ export const PostponedList = memo(function PostponedList({
   const cancelEditing = () => {
     setEditingId(null);
     setEditText('');
+    setEditDate(null);
     setEditFile(null);
     setEditPreview(null);
     setEditRemoveMedia(false);
@@ -149,19 +156,18 @@ export const PostponedList = memo(function PostponedList({
         editText,
         editFile,
         editRemoveMedia,
-        date
+        editDate
       );
       // Update locally instead of a full reload. The server echo for a media
       // change is unknown here, so reconcile silently in the background only
       // when media may have changed.
       setItems((prev) =>
-        prev
-          .map((p) =>
+        prev.map((p) =>
             p.id === item.id
               ? {
                   ...p,
                   text: editText.trim() || null,
-                  scheduled: date ? date.toISOString() : p.scheduled,
+                  scheduled: editDate ? editDate.toISOString() : p.scheduled,
                 }
               : p
           )
@@ -229,6 +235,11 @@ export const PostponedList = memo(function PostponedList({
                 minRows={2}
                 maxRows={6}
                 autoFocus
+              />
+              <SchedulePicker
+                value={editDate}
+                onChange={setEditDate}
+                label={t('postponed.scheduleFor')}
               />
               {((editPreviewUrl &&
                 editFile &&
@@ -366,7 +377,9 @@ export const PostponedList = memo(function PostponedList({
             <>
               <ListItemText
                 primary={item.text ?? t('postponed.mediaOnly')}
-                secondary={"На " + formatDateTime(item.scheduled, i18n.language)}
+                secondary={
+                  'На ' + formatDateTime(item.scheduled, i18n.language)
+                }
               />
               <IconButton
                 size="small"

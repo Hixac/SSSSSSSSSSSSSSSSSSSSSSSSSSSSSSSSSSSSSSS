@@ -17,8 +17,8 @@ export default function PostponedPanel({
   onNotify,
 }: PostponedPanelProps) {
   const { t } = useTranslation();
-  // `date` is shared between the create form and the edit flow (handleSave
-  // reuses it), so it lives here in the thin shell.
+  // `date` is the create-form's schedule time. The edit flow has its own
+  // picker, seeded from each item's `scheduled` value.
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [refreshToken, setRefreshToken] = useState(0);
 
@@ -41,7 +41,6 @@ export default function PostponedPanel({
         />
         <PostponedList
           domain={domain}
-          date={date}
           refreshToken={refreshToken}
           onNotify={onNotify}
         />
