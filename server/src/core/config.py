@@ -81,6 +81,16 @@ class PostgresSettings(BaseSettings):
         return f"{self.POSTGRES_ASYNC_PREFIX}{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_NAME}"
 
 
+class TGSettings(BaseSettings):
+    TELEGRAM_BOT_API_PORT: int | None = None
+    TG_BOT_KEY: str | None = None
+    TG_PHONE_NUMBER: str | None = None
+
+    MTPROTO_PROXY_HOST: str | None = None
+    MTPROTO_PROXY_PORT: str | None = None
+    MTPROTO_PROXY_SECRET: str | None = None
+
+
 class VKSettings(BaseSettings):
     VK_SERVICE_KEY: str | None = None
 
@@ -92,7 +102,8 @@ class Settings(
     EnvironmentSettings,
     JWTSettings,
     UserSessionSettings,
-    VKSettings
+    VKSettings,
+    TGSettings
 ):
     LOG_LEVEL: str
     CORS_ORIGINS: list[str]
