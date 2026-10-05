@@ -19,8 +19,8 @@ services:
     volumes:
       - aiogram-data:/var/lib/telegram-bot-api
     environment:
-      - TELEGRAM_API_ID=${TELEGRAM_API_ID}
-      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
+      - TELEGRAM_API_ID=${TG_BOT_API_ID}
+      - TELEGRAM_API_HASH=${TG_BOT_API_HASH}
 
 volumes:
   aiogram-data:

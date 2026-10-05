@@ -82,17 +82,19 @@ class PostgresSettings(BaseSettings):
 
 
 class TGSettings(BaseSettings):
-    TELEGRAM_BOT_API_PORT: int | None = None
-    TG_BOT_KEY: str | None = None
-    TG_PHONE_NUMBER: str | None = None
+    TG_BOT_API_ID: int
+    TG_BOT_API_HASH: str
+    TG_BOT_API_PORT: str
+    TG_BOT_KEY: str
+    TG_PHONE_NUMBER: str
 
-    MTPROTO_PROXY_HOST: str | None = None
-    MTPROTO_PROXY_PORT: str | None = None
-    MTPROTO_PROXY_SECRET: str | None = None
+    MTPROTO_PROXY_HOST: str
+    MTPROTO_PROXY_PORT: int
+    MTPROTO_PROXY_SECRET: str
 
 
 class VKSettings(BaseSettings):
-    VK_SERVICE_KEY: str | None = None
+    VK_SERVICE_KEY: str
 
 
 class Settings(

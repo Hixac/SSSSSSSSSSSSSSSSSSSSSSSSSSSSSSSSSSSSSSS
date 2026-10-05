@@ -141,13 +141,3 @@ class ContentTooLarge(ManysError):
 class UnsupportedMediaType(ManysError):
     def __init__(self, message: str, status_code: int = 415) -> None:
         super().__init__(message, status_code)
-
-
-class VKServiceKeyIsNotProvided(ManysError):
-    def __init__(self, message: str = "", status_code: int = 500) -> None:
-        super().__init__(message, status_code)
-
-
-class TGBotKeyIsNotProvided(ManysError):
-    def __init__(self, message: str = "", status_code: int = 500) -> None:
-        super().__init__(message, status_code)

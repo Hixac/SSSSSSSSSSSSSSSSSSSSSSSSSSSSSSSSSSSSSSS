@@ -3,13 +3,11 @@ import httpx
 
 from src.api.v1.vk.schemas import VKGroup, VKPost
 from src.core.config import settings
-from src.core.exceptions import ResourceNotFound, VKServiceKeyIsNotProvided
+from src.core.exceptions import ResourceNotFound
 
 
 class VKService:
     def __init__(self) -> None:
-        if settings.VK_SERVICE_KEY is None:
-            raise VKServiceKeyIsNotProvided()
         self.access_token = settings.VK_SERVICE_KEY
         self.vk_api_url = "https://api.vk.ru/method/"
 
