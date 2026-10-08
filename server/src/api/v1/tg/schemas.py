@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -15,4 +17,4 @@ class TGPost(BaseModel):
     is_pinned: bool
     text: str
 
-    photos_url: list[str] | None 
+    photos_url: list[str] | None

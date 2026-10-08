@@ -1,7 +1,9 @@
+from pathlib import Path
 from typing import TypedDict
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+from src.api.v1.tg.service import tg_service
 from src.redis import Redis, create_redis
 from src.core.config import settings
 from src.core.database import (
@@ -48,6 +50,8 @@ async def lifespan(api: FastAPI) -> AsyncIterator[State]:  # pyright: ignore[rep
 
     redis = create_redis("app")
 
+    await tg_service.start()
+
     yield {
         "async_engine": async_engine,
         "async_sessionmaker": async_sessionmaker,
@@ -55,6 +59,8 @@ async def lifespan(api: FastAPI) -> AsyncIterator[State]:  # pyright: ignore[rep
         "sync_sessionmaker": sync_sessionmaker,
         "redis": redis,
     }
+
+    await tg_service.stop()
 
     await redis.aclose(True)
     await async_engine.dispose()

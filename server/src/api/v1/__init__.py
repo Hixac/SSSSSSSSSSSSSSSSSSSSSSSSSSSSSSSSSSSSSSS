@@ -6,6 +6,7 @@ from .auth.endpoints import router as auth_router
 from .vk.endpoints import router as vk_router
 from .tg.endpoints import router as tg_router
 from .group.endpoints import router as group_router
+from .media.endpoints import router as media_router
 
 
 router = APIRouter(prefix='/v1')
@@ -15,3 +16,4 @@ router.include_router(auth_router)
 router.include_router(vk_router)
 router.include_router(tg_router)
 router.include_router(group_router)
+router.include_router(media_router)

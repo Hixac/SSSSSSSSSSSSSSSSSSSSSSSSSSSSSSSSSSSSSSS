@@ -10,17 +10,28 @@ services:
       - "${POSTGRES_PORT}:5432"
     command: ["postgres", "-N", "1000"]
 
-  telegram-bot-api:
-    image: aiogram/telegram-bot-api
-    container_name: telegram-bot-api
-    restart: unless-stopped
+  manys-redis:
+    image: redis:latest
+    container_name: redis_server
+    command: redis-server
     ports:
-      - "${TELEGRAM_BOT_API_PORT}:${TELEGRAM_BOT_API_PORT}"
+      - "6379:6379"
     volumes:
-      - aiogram-data:/var/lib/telegram-bot-api
-    environment:
-      - TELEGRAM_API_ID=${TG_BOT_API_ID}
-      - TELEGRAM_API_HASH=${TG_BOT_API_HASH}
+      - redis_data:/data
+    restart: always
+
+  # telegram-bot-api:
+  #   image: aiogram/telegram-bot-api
+  #   container_name: telegram-bot-api
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${TELEGRAM_BOT_API_PORT}:${TELEGRAM_BOT_API_PORT}"
+  #   volumes:
+  #     - aiogram-data:/var/lib/telegram-bot-api
+  #   environment:
+  #     - TELEGRAM_API_ID=${TG_BOT_API_ID}
+  #     - TELEGRAM_API_HASH=${TG_BOT_API_HASH}
 
 volumes:
   aiogram-data:
+  redis_data:

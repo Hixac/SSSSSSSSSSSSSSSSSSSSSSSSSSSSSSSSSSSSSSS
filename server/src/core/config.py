@@ -86,11 +86,10 @@ class TGSettings(BaseSettings):
     TG_BOT_API_HASH: str
     TG_BOT_API_PORT: str
     TG_BOT_KEY: str
-    TG_PHONE_NUMBER: str
 
-    MTPROTO_PROXY_HOST: str
-    MTPROTO_PROXY_PORT: int
-    MTPROTO_PROXY_SECRET: str
+    MTPROTO_PROXY_HOST: str | None
+    MTPROTO_PROXY_PORT: int | None
+    MTPROTO_PROXY_SECRET: str | None
 
 
 class VKSettings(BaseSettings):
@@ -110,7 +109,9 @@ class Settings(
     LOG_LEVEL: str
     CORS_ORIGINS: list[str]
 
-    WHERE_TO_STORE_MEDIA: Path = Path("/var/uploads/")
+    WHERE_TO_STORE_MEDIA: Path = Path("/var/www/manyS/media/")
+
+    BASE_URL: str = "http://localhost:8443"
 
     model_config = SettingsConfigDict(
             env_file=Path(__file__).parent.parent.parent.joinpath(env_file),
