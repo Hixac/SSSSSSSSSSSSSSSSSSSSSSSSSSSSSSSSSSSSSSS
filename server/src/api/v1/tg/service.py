@@ -42,22 +42,26 @@ class TGService:
         await self.client.disconnect()
 
     async def get_channel_info(self, redis: Redis, domain: str) -> TGChannel:
-        chat = await self.client.get_entity(domain)
-        if isinstance(chat, list):
+        try:
+            # for some fucking reason it throws valueerror and not the rest but I leave it here
+            entity = await self.client.get_entity(domain)
+        except (ValueError, UsernameNotOccupiedError, UsernameInvalidError) as e:
+            raise ResourceNotFound() from e
+        if isinstance(entity, list):
             raise InternalServerError()
 
-        if chat.username is None:
+        if entity.username is None:
             raise ResourceNotFound("Channel is not found")
 
-        path = await self.client.download_profile_photo(chat, file=str(settings.WHERE_TO_STORE_MEDIA))
+        path = await self.client.download_profile_photo(entity, file=str(settings.WHERE_TO_STORE_MEDIA))
         url = None
         if path is not None:
             url = await media_service.generate_url(redis, path)
 
-            return TGChannel(
-                name=chat.title,
-                photo_url=url
-            )
+        return TGChannel(
+            name=entity.title,
+            photo_url=url
+        )
 
     async def scrape_album(self, redis: Redis, message: Message) -> list[str]:
         if not message.media:
