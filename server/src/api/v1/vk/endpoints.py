@@ -12,7 +12,7 @@ router = APIRouter(prefix="/vk", tags=["vk"])
 
 
 @router.get(
-    "/group",
+    "/group/{domain}",
     response_model=VKGroup
 )
 async def group_info(

@@ -115,7 +115,7 @@ class TGService:
         for message in messages:
             posts.append(await self.create_post(redis, message))
 
-            return posts
+        return posts
 
 
 tg_service = TGService()
